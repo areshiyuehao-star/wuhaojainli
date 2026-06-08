@@ -2976,8 +2976,8 @@
 
       .circular-gallery,
       .graphic-gallery.circular-only .circular-gallery {
-        height: min(78vh, 430px) !important;
-        min-height: 340px;
+        height: min(82vh, 500px) !important;
+        min-height: 380px;
         margin-top: 8px;
       }
 
@@ -2988,6 +2988,21 @@
 
       .circular-gallery-item {
         padding: 0;
+        max-width: calc(100vw - 34px);
+      }
+
+      .gallery-art img,
+      .work-media img,
+      .showreel img,
+      .profile-photo-frame img {
+        object-fit: contain !important;
+      }
+
+      .gallery-art,
+      .work-media,
+      .showreel,
+      .profile-photo-frame {
+        background: rgba(14,14,14,0.76);
       }
 
       .circular-gallery-item span {
@@ -3083,8 +3098,8 @@
 
       .circular-gallery,
       .graphic-gallery.circular-only .circular-gallery {
-        min-height: 320px;
-        height: 370px !important;
+        min-height: 360px;
+        height: min(80vh, 450px) !important;
       }
 
       .circular-gallery-item {
@@ -3278,7 +3293,8 @@
       }
 
       .neo-interface #works .work-media {
-        min-height: 180px;
+        min-height: 0;
+        aspect-ratio: 9 / 16;
       }
 
       .neo-interface #works .work-meta {
@@ -4726,9 +4742,35 @@
       }
     };
 
+    const setupPortfolioImageLoading = () => {
+      const loadScopeImages = (scope) => {
+        scope.querySelectorAll("img[loading='lazy']").forEach((image) => {
+          image.loading = "eager";
+          image.decoding = "async";
+        });
+      };
+
+      const scopes = Array.from(document.querySelectorAll(".works-grid, .portfolio-gallery, .asset-gallery-row"));
+      if (!("IntersectionObserver" in window)) {
+        scopes.forEach(loadScopeImages);
+        return;
+      }
+
+      const imageObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          loadScopeImages(entry.target);
+          imageObserver.unobserve(entry.target);
+        });
+      }, { rootMargin: "900px 0px", threshold: 0.01 });
+
+      scopes.forEach((scope) => imageObserver.observe(scope));
+    };
+
     prepareEditableNodes();
     applySavedEdits();
     loadProfilePhoto();
+    setupPortfolioImageLoading();
     setupGraphicGallery();
     setupVideoWorksSlider();
     syncPanelFromSelection();
