@@ -2890,6 +2890,191 @@
       }
     }
 
+    /* Video portfolio: left-sliding rail */
+    .neo-interface #works .works-rail-wrap {
+      margin-inline: calc((100vw - min(calc(100vw - 48px), var(--max))) / -2);
+      padding-inline: max(24px, calc((100vw - var(--max)) / 2));
+      overflow: hidden;
+    }
+
+    .neo-interface #works .works-rail-wrap::before,
+    .neo-interface #works .works-rail-wrap::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      z-index: 4;
+      width: min(12vw, 150px);
+      pointer-events: none;
+    }
+
+    .neo-interface #works .works-rail-wrap::before {
+      left: 0;
+      background: linear-gradient(90deg, #0e0e0e, transparent);
+    }
+
+    .neo-interface #works .works-rail-wrap::after {
+      right: 0;
+      display: block;
+      height: auto;
+      background: linear-gradient(270deg, #0e0e0e, transparent);
+    }
+
+    .video-slider-bar {
+      position: relative;
+      z-index: 8;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin: 0 0 18px;
+      color: rgba(186,201,204,0.68);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .video-slider-bar p {
+      margin: 0;
+    }
+
+    .video-slider-actions {
+      display: inline-flex;
+      gap: 10px;
+    }
+
+    .video-slider-button {
+      width: 46px;
+      height: 46px;
+      border: 1px solid rgba(0, 229, 255, 0.42);
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      color: var(--accent);
+      background: rgba(14, 14, 14, 0.72);
+      box-shadow: 0 18px 50px rgba(0,0,0,0.28), 0 0 24px rgba(0,229,255,0.10);
+      font-size: 34px;
+      line-height: 1;
+      cursor: pointer;
+      transition: transform 180ms ease, border-color 180ms ease, background 180ms ease, color 180ms ease;
+    }
+
+    .video-slider-button:hover {
+      color: #00363d;
+      border-color: var(--accent);
+      background: var(--accent);
+      transform: scale(1.06);
+    }
+
+    body.edit-mode .video-slider-button {
+      pointer-events: none;
+      opacity: 0.35;
+    }
+
+    .neo-interface #works .works-grid {
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: clamp(290px, 38vw, 520px);
+      grid-template-columns: none !important;
+      gap: clamp(18px, 2.6vw, 34px);
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 10px max(24px, 7vw) 34px 0;
+      scroll-snap-type: x mandatory;
+      scroll-padding-inline: max(24px, calc((100vw - var(--max)) / 2));
+      overscroll-behavior-x: contain;
+      cursor: grab;
+      scrollbar-width: thin;
+      scrollbar-color: var(--accent) rgba(255,255,255,0.08);
+    }
+
+    .neo-interface #works .works-grid:active {
+      cursor: grabbing;
+    }
+
+    .neo-interface #works .works-grid::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    .neo-interface #works .works-grid::-webkit-scrollbar-track {
+      background: rgba(255,255,255,0.06);
+    }
+
+    .neo-interface #works .works-grid::-webkit-scrollbar-thumb {
+      background: var(--accent);
+    }
+
+    .neo-interface #works .work-card {
+      min-width: 0;
+      scroll-snap-align: start;
+      transform: none !important;
+    }
+
+    .neo-interface #works .work-card:nth-child(2n),
+    .neo-interface #works .work-card:nth-child(2n):hover {
+      transform: none !important;
+    }
+
+    .neo-interface #works .work-card:hover {
+      transform: translateY(-6px) scale(1.012) !important;
+    }
+
+    .neo-interface #works .work-media {
+      min-height: 210px;
+      aspect-ratio: 16 / 9;
+    }
+
+    .neo-interface #works .work-meta h3 {
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+
+    @media (max-width: 780px) {
+      .neo-interface #works .works-rail-wrap {
+        margin-inline: -14px;
+        padding-inline: 14px;
+      }
+
+      .neo-interface #works .works-rail-wrap::before,
+      .neo-interface #works .works-rail-wrap::after {
+        width: 34px;
+      }
+
+      .video-slider-bar {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+
+      .video-slider-actions {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .video-slider-button {
+        width: 44px;
+        height: 44px;
+        font-size: 32px;
+      }
+
+      .neo-interface #works .works-grid {
+        grid-template-columns: none !important;
+        grid-auto-columns: min(82vw, 360px);
+        gap: 16px;
+        padding: 8px 28px 28px 0;
+      }
+
+      .neo-interface #works .work-media {
+        min-height: 180px;
+      }
+
+      .neo-interface #works .work-meta {
+        grid-template-rows: auto auto auto;
+      }
+    }
+
   </style>
 </head>
 <body class="neo-interface">
@@ -3051,6 +3236,13 @@
       </div>
 
       <div class="works-rail-wrap">
+        <div class="video-slider-bar" aria-label="视频作品集滑动控制">
+          <p>Scroll / Drag left to browse video works</p>
+          <div class="video-slider-actions">
+            <button class="video-slider-button" id="video-prev" type="button" aria-label="上一组视频作品">‹</button>
+            <button class="video-slider-button" id="video-next" type="button" aria-label="下一组视频作品">›</button>
+          </div>
+        </div>
         <div class="works-grid" aria-label="作品网格">
           <article class="work-card reveal" style="transition-delay: 180ms; --tilt-x: 0deg; --tilt-y: 0deg;">
             <div class="work-media">
@@ -3304,6 +3496,9 @@
     const circularGallery = document.querySelector("#graphic-thumbs");
     const galleryPrev = document.querySelector("#gallery-prev");
     const galleryNext = document.querySelector("#gallery-next");
+    const videoWorksGrid = document.querySelector("#works .works-grid");
+    const videoPrev = document.querySelector("#video-prev");
+    const videoNext = document.querySelector("#video-next");
     const root = document.documentElement;
     const themeMeta = document.querySelector('meta[name="theme-color"]');
     const motionCanvas = document.querySelector("#motion-canvas");
@@ -3900,10 +4095,71 @@
       setGraphicActive(0);
     };
 
+    const setupVideoWorksSlider = () => {
+      if (!videoWorksGrid) return;
+      const getStep = () => {
+        const firstCard = videoWorksGrid.querySelector(".work-card");
+        if (!firstCard) return Math.min(window.innerWidth * 0.82, 420);
+        const rect = firstCard.getBoundingClientRect();
+        const styles = window.getComputedStyle(videoWorksGrid);
+        const gap = parseFloat(styles.columnGap || styles.gap || "0") || 0;
+        return rect.width + gap;
+      };
+      const slideByCard = (direction) => {
+        videoWorksGrid.scrollBy({
+          left: direction * getStep(),
+          behavior: "smooth"
+        });
+      };
+
+      let isDown = false;
+      let startX = 0;
+      let startLeft = 0;
+
+      videoWorksGrid.addEventListener("wheel", (event) => {
+        if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
+        event.preventDefault();
+        videoWorksGrid.scrollBy({
+          left: event.deltaY,
+          behavior: "smooth"
+        });
+      }, { passive: false });
+
+      videoWorksGrid.addEventListener("pointerdown", (event) => {
+        if (event.button && event.button !== 0) return;
+        isDown = true;
+        startX = event.clientX;
+        startLeft = videoWorksGrid.scrollLeft;
+        videoWorksGrid.setPointerCapture(event.pointerId);
+      });
+
+      videoWorksGrid.addEventListener("pointermove", (event) => {
+        if (!isDown) return;
+        const delta = event.clientX - startX;
+        videoWorksGrid.scrollLeft = startLeft - delta;
+      });
+
+      const endDrag = () => {
+        isDown = false;
+      };
+
+      videoWorksGrid.addEventListener("pointerup", endDrag);
+      videoWorksGrid.addEventListener("pointercancel", endDrag);
+      videoWorksGrid.addEventListener("pointerleave", endDrag);
+
+      if (videoPrev) {
+        videoPrev.addEventListener("click", () => slideByCard(-1));
+      }
+      if (videoNext) {
+        videoNext.addEventListener("click", () => slideByCard(1));
+      }
+    };
+
     prepareEditableNodes();
     applySavedEdits();
     loadProfilePhoto();
     setupGraphicGallery();
+    setupVideoWorksSlider();
     syncPanelFromSelection();
     syncLayoutPanel();
     updateScrollProgress();
