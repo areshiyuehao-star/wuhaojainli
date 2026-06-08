@@ -2550,6 +2550,48 @@
       height: clamp(320px, 40vw, 520px);
     }
 
+    .asset-gallery-stack {
+      display: grid;
+      gap: clamp(56px, 8vw, 104px);
+      margin-top: clamp(28px, 5vw, 56px);
+    }
+
+    .asset-gallery-row {
+      display: grid;
+      gap: 22px;
+      min-width: 0;
+    }
+
+    .asset-row-head {
+      display: grid;
+      grid-template-columns: minmax(160px, 0.35fr) minmax(220px, 0.65fr) minmax(260px, 1fr);
+      gap: clamp(16px, 3vw, 34px);
+      align-items: end;
+      padding-bottom: 18px;
+      border-bottom: 1px solid rgba(186,201,204,0.18);
+    }
+
+    .asset-row-head h3 {
+      margin: 0;
+      font-family: "Syne", "Arial Black", "Microsoft YaHei", sans-serif;
+      font-size: clamp(28px, 4.8vw, 54px);
+      line-height: 1;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+    }
+
+    .asset-row-head p {
+      margin: 0;
+      color: rgba(229,226,225,0.68);
+      font-size: 15px;
+      line-height: 1.7;
+      overflow-wrap: anywhere;
+    }
+
+    .asset-gallery-row .graphic-gallery.circular-only {
+      margin-top: 0;
+    }
+
     @media (max-width: 980px) {
       .hero-side-stack {
         grid-template-columns: 1fr;
@@ -2765,6 +2807,25 @@
 
       .graphic-gallery.circular-only {
         margin-top: 28px;
+      }
+
+      .asset-gallery-stack {
+        gap: 58px;
+        margin-top: 28px;
+      }
+
+      .asset-row-head {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        padding-bottom: 14px;
+      }
+
+      .asset-row-head h3 {
+        font-size: clamp(30px, 11vw, 48px);
+      }
+
+      .asset-row-head p {
+        font-size: 14px;
       }
 
       .circular-gallery,
@@ -3384,15 +3445,62 @@
         <p class="section-note" data-edit-id="editable-108">整理模型资产、角色资产、场景资产、视觉组件与可复用素材，呈现面向内容生产流程的AIGC资产设计能力。</p>
       </div>
 
-      <div class="graphic-gallery portfolio-gallery reveal circular-only" id="asset-gallery" style="transition-delay: 260ms;" aria-label="AIGC资产设计滑动预览">
-        <div class="circular-gallery" aria-label="滚轮左右切换AIGC资产设计作品">
-          <button class="gallery-nav gallery-nav-prev" type="button" aria-label="上一张">‹</button>
-          <button class="gallery-nav gallery-nav-next" type="button" aria-label="下一张">›</button>
-          <button class="graphic-thumb circular-gallery-item is-active" type="button" data-title="AIGC角色资产" data-name="CHARACTER ASSET"><span>01</span><strong>CHARACTER ASSET</strong></button>
-          <button class="graphic-thumb circular-gallery-item" type="button" data-title="AIGC场景资产" data-name="SCENE ASSET"><span>02</span><strong>SCENE ASSET</strong></button>
-          <button class="graphic-thumb circular-gallery-item" type="button" data-title="提示词资产库" data-name="PROMPT SYSTEM"><span>03</span><strong>PROMPT SYSTEM</strong></button>
-          <button class="graphic-thumb circular-gallery-item" type="button" data-title="镜头分镜资产" data-name="SHOT BOARD"><span>04</span><strong>SHOT BOARD</strong></button>
-          <button class="graphic-thumb circular-gallery-item" type="button" data-title="风格参考资产" data-name="STYLE KIT"><span>05</span><strong>STYLE KIT</strong></button>
+      <div class="asset-gallery-stack reveal" id="asset-gallery" style="transition-delay: 260ms;" aria-label="AIGC资产设计分类滑动预览">
+        <div class="asset-gallery-row">
+          <div class="asset-row-head">
+            <span class="kicker" data-edit-id="editable-110">Asset 01</span>
+            <h3 data-edit-id="editable-111">海报设计</h3>
+            <p data-edit-id="editable-112">面向宣发、视觉主KV和社媒传播的AIGC海报资产。</p>
+          </div>
+          <div class="graphic-gallery portfolio-gallery circular-only" aria-label="海报设计滑动预览">
+            <div class="circular-gallery" aria-label="滚轮左右切换海报设计作品">
+              <button class="gallery-nav gallery-nav-prev" type="button" aria-label="上一张">‹</button>
+              <button class="gallery-nav gallery-nav-next" type="button" aria-label="下一张">›</button>
+              <button class="graphic-thumb circular-gallery-item is-active" type="button" data-title="海报设计 01" data-name="POSTER KV"><span>01</span><strong>POSTER KV</strong></button>
+              <button class="graphic-thumb circular-gallery-item" type="button" data-title="海报设计 02" data-name="CAMPAIGN POSTER"><span>02</span><strong>CAMPAIGN POSTER</strong></button>
+              <button class="graphic-thumb circular-gallery-item" type="button" data-title="海报设计 03" data-name="SOCIAL VISUAL"><span>03</span><strong>SOCIAL VISUAL</strong></button>
+              <button class="graphic-thumb circular-gallery-item" type="button" data-title="海报设计 04" data-name="TITLE POSTER"><span>04</span><strong>TITLE POSTER</strong></button>
+              <button class="graphic-thumb circular-gallery-item" type="button" data-title="海报设计 05" data-name="AIGC SERIES"><span>05</span><strong>AIGC SERIES</strong></button>
+            </div>
+          </div>
+        </div>
+
+        <div class="asset-gallery-row">
+          <div class="asset-row-head">
+            <span class="kicker" data-edit-id="editable-113">Asset 02</span>
+            <h3 data-edit-id="editable-114">角色设计</h3>
+            <p data-edit-id="editable-115">角色设定、服装风格、表情状态和可延展的视觉资产。</p>
+          </div>
+          <div class="graphic-gallery portfolio-gallery circular-only" aria-label="角色设计滑动预览">
+            <div class="circular-gallery" aria-label="滚轮左右切换角色设计作品">
+              <button class="gallery-nav gallery-nav-prev" type="button" aria-label="上一张">‹</button>
+              <button class="gallery-nav gallery-nav-next" type="button" aria-label="下一张">›</button>
+              <button class="graphic-thumb circular-gallery-item is-active" type="button" data-title="角色设计 01" data-name="HERO DESIGN"><span>01</span><strong>HERO DESIGN</strong></button>
+              <button class="graphic-thumb circular-gallery-item" type="button" data-title="角色设计 02" data-name="COSTUME KIT"><span>02</span><strong>COSTUME KIT</strong></button>
+              <button class="graphic-thumb circular-gallery-item" type="button" data-title="角色设计 03" data-name="EXPRESSION SET"><span>03</span><strong>EXPRESSION SET</strong></button>
+              <button class="graphic-thumb circular-gallery-item" type="button" data-title="角色设计 04" data-name="STYLE SHEET"><span>04</span><strong>STYLE SHEET</strong></button>
+              <button class="graphic-thumb circular-gallery-item" type="button" data-title="角色设计 05" data-name="CHARACTER IP"><span>05</span><strong>CHARACTER IP</strong></button>
+            </div>
+          </div>
+        </div>
+
+        <div class="asset-gallery-row">
+          <div class="asset-row-head">
+            <span class="kicker" data-edit-id="editable-116">Asset 03</span>
+            <h3 data-edit-id="editable-117">场景设计</h3>
+            <p data-edit-id="editable-118">场景概念、空间氛围、镜头背景和故事世界观资产。</p>
+          </div>
+          <div class="graphic-gallery portfolio-gallery circular-only" aria-label="场景设计滑动预览">
+            <div class="circular-gallery" aria-label="滚轮左右切换场景设计作品">
+              <button class="gallery-nav gallery-nav-prev" type="button" aria-label="上一张">‹</button>
+              <button class="gallery-nav gallery-nav-next" type="button" aria-label="下一张">›</button>
+              <button class="graphic-thumb circular-gallery-item is-active" type="button" data-title="场景设计 01" data-name="WORLD CONCEPT"><span>01</span><strong>WORLD CONCEPT</strong></button>
+              <button class="graphic-thumb circular-gallery-item" type="button" data-title="场景设计 02" data-name="CITY SCENE"><span>02</span><strong>CITY SCENE</strong></button>
+              <button class="graphic-thumb circular-gallery-item" type="button" data-title="场景设计 03" data-name="ROOM SET"><span>03</span><strong>ROOM SET</strong></button>
+              <button class="graphic-thumb circular-gallery-item" type="button" data-title="场景设计 04" data-name="LIGHT MOOD"><span>04</span><strong>LIGHT MOOD</strong></button>
+              <button class="graphic-thumb circular-gallery-item" type="button" data-title="场景设计 05" data-name="STORY SPACE"><span>05</span><strong>STORY SPACE</strong></button>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -3512,6 +3620,8 @@
       ".graphic-main",
       ".graphic-thumb",
       ".circular-gallery",
+      ".asset-gallery-row",
+      ".asset-row-head",
       ".workflow",
       ".workflow-visual",
       ".step",
