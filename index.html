@@ -2561,6 +2561,335 @@
       }
     }
 
+    /* Mobile adaptation patch */
+    @media (max-width: 780px) {
+      body {
+        min-width: 0;
+      }
+
+      .motion-canvas {
+        width: 100vw !important;
+        height: 100vh !important;
+        opacity: 0.42;
+      }
+
+      .page-shell {
+        width: min(calc(100% - 28px), var(--max));
+      }
+
+      .topbar-inner {
+        min-height: 64px;
+        gap: 8px;
+      }
+
+      .brand {
+        flex: 1 1 auto;
+        min-width: 0;
+        font-size: 20px;
+      }
+
+      .brand small {
+        display: none;
+      }
+
+      .topbar-inner > div {
+        flex: 0 0 auto;
+      }
+
+      .icon-button {
+        width: 38px;
+        min-height: 38px;
+      }
+
+      .edit-button {
+        min-height: 38px;
+        padding: 0 10px;
+        font-size: 12px;
+      }
+
+      .nav {
+        inset: 64px 14px auto 14px;
+        max-height: calc(100vh - 82px);
+        overflow-y: auto;
+      }
+
+      .hero {
+        min-height: auto !important;
+        padding: 44px 0 58px !important;
+      }
+
+      .hero-grid {
+        grid-template-columns: 1fr !important;
+        gap: 28px;
+        align-items: start;
+      }
+
+      .neo-interface h1 {
+        margin: 16px 0 18px;
+        font-size: clamp(50px, 18vw, 86px) !important;
+        line-height: 0.88;
+      }
+
+      .hero-name,
+      .hero-roman {
+        max-width: 100%;
+        padding: 0 !important;
+        font-size: clamp(50px, 18vw, 86px) !important;
+        overflow-wrap: anywhere;
+      }
+
+      .hero-copy {
+        font-size: 16px !important;
+        line-height: 1.65;
+      }
+
+      .hero-actions {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 10px;
+        width: 100%;
+        margin-top: 24px;
+      }
+
+      .button {
+        width: 100%;
+        min-height: 44px;
+        padding-inline: 14px;
+        white-space: normal;
+        text-align: center;
+      }
+
+      .hero-side-stack {
+        grid-template-columns: 1fr !important;
+        gap: 14px;
+      }
+
+      .neo-interface .hero-panel {
+        margin-top: 0;
+        padding: 18px;
+      }
+
+      .focus-list {
+        gap: 10px;
+      }
+
+      .focus-list li {
+        grid-template-columns: 1fr;
+        gap: 4px;
+        font-size: 13px;
+      }
+
+      .focus-list span {
+        text-align: left;
+      }
+
+      .profile-photo-frame {
+        min-height: 0;
+        max-height: 280px;
+        aspect-ratio: 4 / 3;
+      }
+
+      .section,
+      .neo-interface .section {
+        padding: 64px 0 !important;
+      }
+
+      .section-head {
+        gap: 12px;
+        margin-bottom: 28px;
+      }
+
+      .section-note {
+        max-width: 100%;
+        font-size: 15px;
+      }
+
+      .neo-interface .section-head h2 {
+        font-size: clamp(32px, 12vw, 52px);
+        line-height: 1.06;
+      }
+
+      .showreel,
+      .neo-interface .showreel {
+        min-height: clamp(280px, 76vw, 430px);
+      }
+
+      .neo-interface .showreel-content,
+      .showreel-content {
+        inset: auto 16px 16px 16px;
+      }
+
+      .works-rail-wrap {
+        margin-inline: 0;
+        padding-inline: 0;
+      }
+
+      .neo-interface .works-grid {
+        grid-template-columns: 1fr !important;
+        gap: 22px;
+      }
+
+      .work-card,
+      .case-card {
+        min-width: 0;
+      }
+
+      .about-grid,
+      .case-grid {
+        grid-template-columns: 1fr !important;
+        gap: 22px;
+      }
+
+      .skill-list {
+        gap: 8px;
+      }
+
+      .skill {
+        min-height: 38px;
+        padding: 0 12px;
+      }
+
+      .contact-list a,
+      .contact-list span,
+      .footer-inner p {
+        overflow-wrap: anywhere;
+      }
+
+      .footer-inner {
+        gap: 18px;
+      }
+
+      .footer-mark {
+        font-size: clamp(52px, 18vw, 92px);
+      }
+
+      .graphic-gallery.circular-only {
+        margin-top: 28px;
+      }
+
+      .circular-gallery,
+      .graphic-gallery.circular-only .circular-gallery {
+        height: min(82vh, 360px) !important;
+        min-height: 300px;
+        margin-top: 8px;
+      }
+
+      .circular-gallery::before,
+      .circular-gallery::after {
+        width: 18%;
+      }
+
+      .circular-gallery-item {
+        width: min(66vw, 235px) !important;
+        height: clamp(138px, 44vw, 190px) !important;
+        padding: 14px;
+      }
+
+      .circular-gallery-item span {
+        font-size: 11px;
+      }
+
+      .circular-gallery-item strong {
+        font-size: clamp(20px, 8vw, 28px);
+        line-height: 0.96;
+        overflow-wrap: anywhere;
+      }
+
+      .gallery-nav {
+        top: auto !important;
+        bottom: 14px;
+        width: 46px;
+        height: 46px;
+        font-size: 34px;
+        transform: none;
+      }
+
+      .gallery-nav:hover {
+        transform: scale(1.04);
+      }
+
+      .gallery-nav-prev {
+        left: calc(50% - 62px) !important;
+      }
+
+      .gallery-nav-next {
+        left: calc(50% + 16px) !important;
+        right: auto !important;
+      }
+
+      .circular-gallery-help {
+        margin-top: 10px;
+        font-size: 10px;
+      }
+
+      .neo-interface .design-panel {
+        left: 10px;
+        right: 10px;
+        top: 72px;
+        bottom: 124px;
+        width: auto;
+        padding: 12px;
+      }
+
+      .neo-interface .edit-toolbar {
+        left: 10px;
+        right: 10px;
+        bottom: 10px;
+        display: none;
+        max-height: 108px;
+        overflow-y: auto;
+        transform: none;
+      }
+
+      body.edit-mode .neo-interface .edit-toolbar,
+      body.edit-mode .edit-toolbar {
+        display: flex;
+      }
+
+      .neo-interface .edit-toolbar button {
+        flex: 1 1 calc(50% - 8px);
+        min-height: 36px;
+        padding-inline: 10px;
+        font-size: 12px;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .page-shell {
+        width: min(calc(100% - 22px), var(--max));
+      }
+
+      .neo-interface h1,
+      .hero-name,
+      .hero-roman {
+        font-size: clamp(44px, 19vw, 76px) !important;
+      }
+
+      .eyebrow,
+      .neo-interface .eyebrow,
+      .neo-interface .kicker {
+        letter-spacing: 0.18em;
+      }
+
+      .profile-photo-frame {
+        max-height: 240px;
+      }
+
+      .circular-gallery,
+      .graphic-gallery.circular-only .circular-gallery {
+        min-height: 286px;
+        height: 330px !important;
+      }
+
+      .circular-gallery-item {
+        width: min(72vw, 220px) !important;
+      }
+
+      .gallery-nav {
+        bottom: 10px;
+      }
+    }
+
   </style>
 </head>
 <body class="neo-interface">
