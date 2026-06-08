@@ -1,0 +1,3872 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="dark" style="--scroll-progress: 0.0300; --cursor-x: 988.1014903357378px; --cursor-y: 973.3317657162174px;"><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>伍浩 WUHAO | AI 视频设计师作品集</title>
+  <meta name="description" content="伍浩 WUHAO，AI 视频设计师，专注 AIGC 视频、平面设计、动漫设计与视觉叙事。">
+  <meta property="og:title" content="伍浩 WUHAO | AI 视频设计师">
+  <meta property="og:description" content="AIGC video design, motion graphics, visual storytelling.">
+  <meta property="og:type" content="website">
+  <meta name="theme-color" content="#09090b">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #07080b;
+      --surface: #101217;
+      --surface-2: #171a21;
+      --surface-3: #232631;
+      --text: #f7f2ea;
+      --muted: #b5aea2;
+      --dim: #7e7a73;
+      --line: rgba(247, 242, 234, 0.14);
+      --accent: #b28cff;
+      --accent-2: #64e1d4;
+      --accent-3: #f3c969;
+      --accent-ink: #120b1f;
+      --shadow: 0 24px 80px rgba(0, 0, 0, 0.42);
+      --ambient-a: rgba(178, 140, 255, 0.16);
+      --ambient-b: rgba(100, 225, 212, 0.09);
+      --ambient-c: rgba(243, 201, 105, 0.08);
+      --cursor-light: rgba(167, 139, 250, 0.22);
+      --cursor-light-2: rgba(110, 231, 183, 0.12);
+      --cursor-x: 50vw;
+      --cursor-y: 34vh;
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
+      --radius: 18px;
+      --max: 1180px;
+    }
+
+    [data-theme="light"] {
+      color-scheme: light;
+      --bg: #f4f0e8;
+      --surface: #fbf8f1;
+      --surface-2: #ebe4d8;
+      --surface-3: #ddd3c5;
+      --text: #161412;
+      --muted: #655f58;
+      --dim: #8b8277;
+      --line: rgba(22, 20, 18, 0.16);
+      --accent: #6841c8;
+      --accent-2: #047857;
+      --accent-3: #b7791f;
+      --accent-ink: #f8f2ff;
+      --shadow: 0 24px 70px rgba(72, 55, 34, 0.16);
+      --ambient-a: rgba(104, 65, 200, 0.1);
+      --ambient-b: rgba(4, 120, 87, 0.07);
+      --ambient-c: rgba(14, 116, 144, 0.06);
+      --cursor-light: rgba(104, 65, 200, 0.14);
+      --cursor-light-2: rgba(4, 120, 87, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      max-width: 100%;
+      background:
+        radial-gradient(circle at 82% 12%, var(--ambient-a), transparent 24rem),
+        linear-gradient(180deg, var(--ambient-b), transparent 34rem),
+        var(--bg);
+      color: var(--text);
+      font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+      line-height: 1.6;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.5;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: linear-gradient(to bottom, black, transparent 78%);
+    }
+
+    .ambient-field,
+    .cursor-light,
+    .motion-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    header,
+    main,
+    footer {
+      position: relative;
+      z-index: 1;
+    }
+
+    .ambient-field {
+      overflow: hidden;
+      contain: paint;
+      opacity: 0.92;
+    }
+
+    .ambient-field::before,
+    .ambient-field::after {
+      content: "";
+      position: absolute;
+      will-change: transform, opacity;
+      transform: translate3d(0, 0, 0);
+    }
+
+    .ambient-field::before {
+      width: min(1120px, 120vw);
+      height: min(880px, 110vh);
+      left: -12vw;
+      top: -8vh;
+      background:
+        radial-gradient(closest-side at 22% 28%, var(--ambient-a), transparent 72%),
+        radial-gradient(closest-side at 76% 18%, var(--ambient-c), transparent 70%),
+        radial-gradient(closest-side at 56% 76%, var(--ambient-b), transparent 76%);
+      opacity: 0.48;
+      animation: ambient-drift-a 34s var(--ease-soft) infinite alternate;
+    }
+
+    .ambient-field::after {
+      width: min(980px, 105vw);
+      height: min(760px, 95vh);
+      right: -18vw;
+      bottom: -12vh;
+      background:
+        linear-gradient(115deg, transparent 18%, color-mix(in srgb, var(--accent) 16%, transparent) 38%, transparent 62%),
+        radial-gradient(closest-side at 62% 42%, var(--ambient-b), transparent 72%);
+      opacity: 0.16;
+      animation: ambient-drift-b 48s var(--ease-soft) infinite alternate;
+    }
+
+    .cursor-light {
+      width: 34rem;
+      height: 34rem;
+      inset: auto;
+      left: 0;
+      top: 0;
+      border-radius: 999px;
+      opacity: 0;
+      transform: translate3d(calc(var(--cursor-x) - 50%), calc(var(--cursor-y) - 50%), 0);
+      transition: opacity 320ms ease;
+      will-change: transform, opacity;
+      background: radial-gradient(circle, var(--cursor-light) 0%, var(--cursor-light-2) 34%, transparent 68%);
+    }
+
+    body.pointer-active .cursor-light {
+      opacity: 1;
+    }
+
+    .motion-canvas {
+      width: 100%;
+      height: 100%;
+      opacity: 0.72;
+      mix-blend-mode: screen;
+    }
+
+    .scroll-progress {
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 100;
+      width: 100%;
+      height: 3px;
+      transform-origin: left center;
+      transform: scaleX(var(--scroll-progress, 0));
+      background: linear-gradient(90deg, var(--accent-2), var(--accent), var(--accent-3));
+      box-shadow: 0 0 24px color-mix(in srgb, var(--accent-2) 42%, transparent);
+      pointer-events: none;
+    }
+
+    @keyframes ambient-drift-a {
+      0% { transform: translate3d(-2%, -1%, 0) scale(1); }
+      50% { transform: translate3d(2%, 1.5%, 0) scale(1.04); }
+      100% { transform: translate3d(4%, -2%, 0) scale(1.02); }
+    }
+
+    @keyframes ambient-drift-b {
+      0% { transform: translate3d(3%, 2%, 0) rotate(0deg) scale(1.02); }
+      100% { transform: translate3d(-3%, -1%, 0) rotate(4deg) scale(1.06); }
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .page-shell {
+      width: min(calc(100% - 48px), var(--max));
+      margin: 0 auto;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      border-bottom: 1px solid var(--line);
+      background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(18px);
+    }
+
+    .topbar::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -1px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent-2), var(--accent), transparent);
+      opacity: 0.42;
+    }
+
+    .topbar-inner {
+      min-height: 78px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      min-width: 0;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 10px;
+      font-weight: 900;
+      letter-spacing: 0;
+      font-size: 24px;
+      text-shadow: 0 0 30px color-mix(in srgb, var(--accent) 26%, transparent);
+    }
+
+    .brand small {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav a,
+    .icon-button,
+    .edit-button {
+      min-height: 42px;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 180ms ease, border-color 180ms ease, background 180ms ease, transform 220ms var(--ease-out);
+    }
+
+    .nav a {
+      padding: 0 14px;
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .nav a:hover,
+    .icon-button:hover,
+    .edit-button:hover {
+      color: var(--text);
+      border-color: var(--line);
+      background: var(--surface);
+      transform: translateY(-1px);
+    }
+
+    .icon-button {
+      width: 42px;
+      cursor: pointer;
+      background: transparent;
+    }
+
+    .edit-button {
+      padding: 0 14px;
+      cursor: pointer;
+      background: transparent;
+      font-size: 13px;
+      letter-spacing: 0.08em;
+    }
+
+    .edit-button.is-active {
+      color: var(--accent-ink);
+      border-color: transparent;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    }
+
+    .edit-toolbar {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      z-index: 80;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--surface) 88%, transparent);
+      box-shadow: var(--shadow);
+      transform: translateX(-50%);
+      backdrop-filter: blur(18px);
+    }
+
+    body.edit-mode .edit-toolbar {
+      display: flex;
+    }
+
+    .edit-toolbar button {
+      min-height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 0 14px;
+      color: var(--text);
+      background: var(--surface-2);
+      cursor: pointer;
+    }
+
+    .edit-toolbar button:hover {
+      border-color: color-mix(in srgb, var(--accent) 58%, var(--line));
+    }
+
+    .design-panel {
+      position: fixed;
+      top: 96px;
+      right: 24px;
+      z-index: 85;
+      display: none;
+      width: min(330px, calc(100vw - 32px));
+      max-height: calc(100vh - 128px);
+      overflow: auto;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      color: var(--text);
+      background: color-mix(in srgb, var(--surface) 92%, transparent);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    body.edit-mode .design-panel {
+      display: block;
+    }
+
+    .design-panel h3 {
+      margin: 0 0 12px;
+      font-size: 15px;
+      letter-spacing: 0;
+    }
+
+    .design-panel label {
+      display: grid;
+      gap: 6px;
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .design-panel input,
+    .design-panel textarea,
+    .design-panel select {
+      width: 100%;
+      min-height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 8px 10px;
+      color: var(--text);
+      background: var(--surface-2);
+      font: inherit;
+    }
+
+    .design-panel textarea {
+      min-height: 86px;
+      resize: vertical;
+    }
+
+    .design-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .design-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .design-actions button {
+      min-height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      color: var(--text);
+      background: var(--surface-2);
+      cursor: pointer;
+    }
+
+    .design-actions button:hover {
+      border-color: color-mix(in srgb, var(--accent) 58%, var(--line));
+    }
+
+    .design-hint {
+      margin: 8px 0 0;
+      color: var(--dim);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .editable-target {
+      outline: 1px dashed color-mix(in srgb, var(--accent) 42%, transparent);
+      outline-offset: 4px;
+      cursor: text;
+    }
+
+    .editable-target:hover {
+      background: color-mix(in srgb, var(--accent) 12%, transparent);
+    }
+
+    .editable-target.is-selected {
+      outline: 2px solid var(--accent-2);
+      background: color-mix(in srgb, var(--accent-2) 13%, transparent);
+    }
+
+    .custom-text-box {
+      position: absolute;
+      z-index: 6;
+      width: 280px;
+      min-height: 48px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      color: var(--text);
+      background: color-mix(in srgb, var(--surface) 86%, transparent);
+      box-shadow: 0 14px 42px rgba(0, 0, 0, 0.22);
+      line-height: 1.5;
+    }
+
+    body.edit-mode .custom-text-box {
+      cursor: move;
+    }
+
+    body.edit-mode .custom-text-box::after {
+      content: "拖动";
+      position: absolute;
+      right: 8px;
+      top: -24px;
+      padding: 2px 8px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      background: var(--surface);
+      font-size: 11px;
+    }
+
+    .edit-toast {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      z-index: 90;
+      max-width: min(360px, calc(100vw - 48px));
+      padding: 12px 16px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      color: var(--text);
+      background: color-mix(in srgb, var(--surface) 92%, transparent);
+      box-shadow: var(--shadow);
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 180ms ease, transform 180ms ease;
+      pointer-events: none;
+    }
+
+    .edit-toast.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .menu-button {
+      display: none;
+    }
+
+    .hero {
+      min-height: calc(100vh - 78px);
+      display: grid;
+      align-items: center;
+      padding: 82px 0 72px;
+      position: relative;
+    }
+
+    .hero::before {
+      content: "PORTFOLIO / 2026";
+      position: absolute;
+      left: 0;
+      top: 34px;
+      color: var(--dim);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.24em;
+      writing-mode: vertical-rl;
+      opacity: 0.72;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: 0;
+      bottom: 62px;
+      width: min(42vw, 520px);
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent-2), var(--accent-3));
+      opacity: 0.56;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: clamp(32px, 6vw, 84px);
+      align-items: end;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--accent-2);
+      font-size: 12px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 38px;
+      height: 1px;
+      background: currentColor;
+    }
+
+    h1 {
+      margin: 20px 0 24px;
+      font-size: clamp(56px, 11vw, 132px);
+      line-height: 0.92;
+      letter-spacing: 0;
+      font-weight: 950;
+      text-wrap: balance;
+    }
+
+    .hero-name {
+      display: block;
+    }
+
+    .hero-roman {
+      display: block;
+      color: transparent;
+      background: linear-gradient(100deg, var(--accent-2), var(--accent), var(--accent-3));
+      background-clip: text;
+      -webkit-background-clip: text;
+      font-style: italic;
+      padding-left: 0.05em;
+      filter: drop-shadow(0 18px 42px color-mix(in srgb, var(--accent) 22%, transparent));
+    }
+
+    .hero-copy {
+      max-width: 660px;
+      color: var(--muted);
+      font-size: clamp(18px, 2vw, 24px);
+      line-height: 1.72;
+      margin: 0;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 34px;
+    }
+
+    .button {
+      min-height: 48px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 0 20px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 700;
+      transition: transform 220ms var(--ease-out), background 180ms ease, border-color 180ms ease, box-shadow 220ms var(--ease-out);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .button::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      translate: -120% 0;
+      background: linear-gradient(110deg, transparent, rgba(255,255,255,0.24), transparent);
+      transition: translate 560ms var(--ease-out);
+    }
+
+    .button:hover {
+      transform: translateY(-3px) scale(1.015);
+      border-color: color-mix(in srgb, var(--accent) 70%, var(--line));
+      box-shadow: 0 14px 42px color-mix(in srgb, var(--accent) 18%, transparent);
+    }
+
+    .button:hover::after {
+      translate: 120% 0;
+    }
+
+    .button.primary {
+      background: var(--accent);
+      color: var(--accent-ink);
+      border-color: transparent;
+    }
+
+    .hero-panel {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 24px;
+      display: grid;
+      gap: 18px;
+      background:
+        linear-gradient(135deg, color-mix(in srgb, var(--surface) 82%, transparent), color-mix(in srgb, var(--surface-2) 68%, transparent)),
+        linear-gradient(90deg, color-mix(in srgb, var(--accent-2) 10%, transparent), transparent);
+      box-shadow: 0 22px 70px rgba(0,0,0,0.24);
+      transition: transform 360ms var(--ease-out), border-color 220ms ease, box-shadow 360ms var(--ease-out);
+    }
+
+    .hero-panel:hover {
+      transform: translateY(-4px);
+      border-color: color-mix(in srgb, var(--accent) 40%, var(--line));
+      box-shadow: 0 30px 90px color-mix(in srgb, var(--accent-2) 12%, rgba(0,0,0,0.24));
+    }
+
+    .focus-list {
+      display: grid;
+      gap: 12px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .focus-list li {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      color: var(--muted);
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 12px;
+      font-size: 14px;
+    }
+
+    .focus-list li > * {
+      min-width: 0;
+    }
+
+    .focus-list span {
+      text-align: right;
+      overflow-wrap: anywhere;
+    }
+
+    .focus-list strong {
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .section {
+      padding: clamp(72px, 10vw, 144px) 0;
+      border-top: 1px solid var(--line);
+      position: relative;
+    }
+
+    .section::before {
+      content: "";
+      position: absolute;
+      left: max(24px, calc((100vw - var(--max)) / 2));
+      top: -1px;
+      width: min(180px, 32vw);
+      height: 1px;
+      background: linear-gradient(90deg, var(--accent-3), transparent);
+      opacity: 0.74;
+    }
+
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(240px, 0.45fr) 1fr;
+      gap: 32px;
+      align-items: end;
+      margin-bottom: 46px;
+    }
+
+    .kicker {
+      color: var(--dim);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      font-size: 12px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .kicker::after {
+      content: "";
+      width: 28px;
+      height: 1px;
+      background: currentColor;
+      opacity: 0.52;
+    }
+
+    h2 {
+      margin: 10px 0 0;
+      font-size: clamp(32px, 5vw, 56px);
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    .section-note {
+      color: var(--muted);
+      max-width: 620px;
+      margin: 0;
+      font-size: 16px;
+      overflow-wrap: anywhere;
+    }
+
+    .showreel {
+      display: grid;
+      grid-template-columns: 1fr;
+      min-height: min(64vw, 670px);
+      width: 100%;
+      padding: 0;
+      border: 0;
+      color: inherit;
+      text-align: left;
+      cursor: pointer;
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      background: var(--surface-2);
+      position: relative;
+      isolation: isolate;
+      transition: transform 420ms var(--ease-out), box-shadow 420ms var(--ease-out), border-color 220ms ease;
+      transform-style: flat;
+    }
+
+    .showreel img {
+      filter: saturate(0.86) contrast(1.05);
+      opacity: 0.78;
+      transition: transform 900ms cubic-bezier(0.16, 1, 0.3, 1), opacity 250ms ease;
+    }
+
+    .showreel:hover img {
+      transform: scale(1.035);
+      opacity: 0.92;
+    }
+
+    .showreel:hover {
+      transform: translateY(-8px) scale(1.008);
+      box-shadow: 0 34px 100px color-mix(in srgb, var(--accent) 18%, rgba(0, 0, 0, 0.36));
+    }
+
+    .showreel::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(0deg, rgba(9,9,11,0.82), transparent 45%), linear-gradient(90deg, rgba(9,9,11,0.5), transparent 58%);
+      z-index: 1;
+    }
+
+    .showreel::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      opacity: 0;
+      background: linear-gradient(120deg, transparent 20%, rgba(255,255,255,0.18) 42%, transparent 62%);
+      transform: translateX(-80%);
+      transition: opacity 240ms ease, transform 900ms var(--ease-out);
+      pointer-events: none;
+    }
+
+    .showreel:hover::before {
+      opacity: 1;
+      transform: translateX(80%);
+    }
+
+    .showreel-content {
+      position: absolute;
+      inset: auto 28px 28px 28px;
+      z-index: 2;
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 24px;
+      color: #f6f3ee;
+    }
+
+    .play-badge {
+      width: 74px;
+      height: 74px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: rgba(167, 139, 250, 0.92);
+      color: #14091d;
+      font-size: 30px;
+      box-shadow: 0 18px 56px rgba(167, 139, 250, 0.26);
+      transition: transform 300ms var(--ease-out), box-shadow 300ms var(--ease-out);
+    }
+
+    .showreel:hover .play-badge {
+      transform: translateY(-3px) scale(1.06);
+      box-shadow: 0 22px 70px color-mix(in srgb, var(--accent) 36%, transparent);
+    }
+
+    .showreel h3 {
+      margin: 0 0 8px;
+      font-size: clamp(26px, 4vw, 48px);
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .showreel p {
+      margin: 0;
+      max-width: 520px;
+      color: rgba(246,243,238,0.74);
+    }
+
+    .works-rail-wrap {
+      position: relative;
+      margin-inline: calc((100vw - min(calc(100vw - 48px), var(--max))) / -2);
+      padding-inline: calc((100vw - min(calc(100vw - 48px), var(--max))) / 2);
+      overflow: hidden;
+    }
+
+    .works-rail-wrap::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: clamp(40px, 10vw, 120px);
+      height: 100%;
+      pointer-events: none;
+      background: linear-gradient(90deg, transparent, var(--bg));
+    }
+
+    .works-grid {
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: clamp(280px, 36vw, 460px);
+      gap: 18px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 6px 0 24px;
+      scroll-snap-type: x mandatory;
+      overscroll-behavior-x: contain;
+      scrollbar-width: thin;
+      scrollbar-color: var(--surface-3) transparent;
+    }
+
+    .work-card {
+      display: grid;
+      gap: 18px;
+      color: inherit;
+      scroll-snap-align: start;
+      position: relative;
+      transform-origin: center bottom;
+      transition: transform 320ms var(--ease-out);
+      transform-style: preserve-3d;
+      --tilt-x: 0deg;
+      --tilt-y: 0deg;
+    }
+
+    .work-media {
+      aspect-ratio: 4 / 3;
+      overflow: hidden;
+      border-radius: var(--radius);
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      position: relative;
+      isolation: isolate;
+      box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+      transition: border-color 260ms ease, box-shadow 320ms var(--ease-out);
+    }
+
+    .work-media::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0;
+      z-index: 1;
+      transition: opacity 260ms ease;
+      background: radial-gradient(circle at 50% 28%, color-mix(in srgb, var(--accent) 18%, transparent), transparent 58%);
+    }
+
+    .work-media img {
+      opacity: 0.82;
+      transition: transform 800ms cubic-bezier(0.16, 1, 0.3, 1), opacity 220ms ease;
+    }
+
+    .work-video {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      background: var(--surface-2);
+    }
+
+    .work-video:fullscreen,
+    .work-video:-webkit-full-screen {
+      object-fit: contain;
+      background: #000;
+    }
+
+    .work-card:hover img {
+      transform: scale(1.045);
+      opacity: 1;
+    }
+
+    .work-card:hover {
+      transform: translateY(-8px) scale(1.018) rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
+    }
+
+    .work-card:hover .work-media {
+      border-color: color-mix(in srgb, var(--accent) 48%, var(--line));
+      box-shadow: 0 24px 70px color-mix(in srgb, var(--accent) 12%, transparent);
+    }
+
+    .work-card:hover .work-media::after {
+      opacity: 1;
+    }
+
+    .work-meta {
+      display: grid;
+      grid-template-rows: auto minmax(5.2em, auto) auto;
+      gap: 14px;
+      align-items: start;
+      border-top: 1px solid var(--line);
+      padding-top: 18px;
+      transform: translateZ(12px);
+    }
+
+    .work-meta h3 {
+      margin: 0;
+      min-height: 1.18em;
+      font-size: clamp(26px, 3vw, 38px);
+      line-height: 1.18;
+      letter-spacing: 0;
+      white-space: nowrap;
+    }
+
+    .work-meta p {
+      margin: 0;
+      color: var(--muted);
+      max-width: 56ch;
+      overflow-wrap: anywhere;
+    }
+
+    .index {
+      color: var(--accent);
+      font-weight: 900;
+      letter-spacing: 0.12em;
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .tag {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      padding: 5px 10px;
+      font-size: 12px;
+      line-height: 1;
+      background: color-mix(in srgb, var(--surface) 68%, transparent);
+      box-shadow: inset 0 0 18px color-mix(in srgb, var(--accent-2) 5%, transparent);
+    }
+
+    .workflow {
+      display: grid;
+      grid-template-columns: 0.85fr 1.15fr;
+      gap: clamp(28px, 6vw, 72px);
+      align-items: start;
+    }
+
+    .workflow-visual {
+      position: sticky;
+      top: 110px;
+      aspect-ratio: 3 / 4;
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background: var(--surface-2);
+      box-shadow: var(--shadow);
+      transform-style: preserve-3d;
+    }
+
+    .workflow-visual::after {
+      content: "PROCESS";
+      position: absolute;
+      right: 18px;
+      bottom: 14px;
+      z-index: 2;
+      color: rgba(247,242,234,0.42);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.24em;
+    }
+
+    .steps {
+      display: grid;
+      gap: 14px;
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: 62px 1fr;
+      gap: 18px;
+      padding: 22px 0;
+      border-bottom: 1px solid var(--line);
+      position: relative;
+      transition: transform 260ms var(--ease-out), border-color 220ms ease, padding-left 260ms var(--ease-out);
+    }
+
+    .step::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 18px;
+      bottom: 18px;
+      width: 2px;
+      background: linear-gradient(180deg, var(--accent-2), var(--accent));
+      opacity: 0;
+      transition: opacity 220ms ease;
+    }
+
+    .step:hover {
+      transform: translateX(6px);
+      padding-left: 14px;
+      border-color: color-mix(in srgb, var(--accent) 38%, var(--line));
+    }
+
+    .step:hover::before {
+      opacity: 1;
+    }
+
+    .step-number {
+      width: 46px;
+      height: 46px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      color: var(--accent);
+      font-weight: 900;
+      box-shadow: 0 0 28px color-mix(in srgb, var(--accent) 10%, transparent);
+    }
+
+    .step h3 {
+      margin: 0 0 6px;
+      font-size: 23px;
+      letter-spacing: 0;
+    }
+
+    .step p {
+      margin: 0;
+      color: var(--muted);
+      overflow-wrap: anywhere;
+    }
+
+    .case-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 22px;
+    }
+
+    .case-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: color-mix(in srgb, var(--surface) 80%, transparent);
+      display: grid;
+      align-content: start;
+      position: relative;
+      isolation: isolate;
+      transition: transform 320ms var(--ease-out), border-color 220ms ease, background 220ms ease, box-shadow 320ms var(--ease-out);
+      transform-style: preserve-3d;
+    }
+
+    .case-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0;
+      z-index: 1;
+      transition: opacity 260ms ease;
+      background: radial-gradient(circle at 50% 18%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 58%);
+    }
+
+    .case-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      opacity: 0;
+      background: linear-gradient(130deg, transparent 24%, color-mix(in srgb, var(--accent-3) 12%, transparent), transparent 62%);
+      transform: translateX(-45%);
+      transition: opacity 240ms ease, transform 680ms var(--ease-out);
+    }
+
+    .case-card:hover {
+      transform: translateY(-8px) scale(1.015);
+      border-color: color-mix(in srgb, var(--accent) 55%, var(--line));
+      background: var(--surface);
+      box-shadow: 0 24px 80px color-mix(in srgb, var(--accent) 12%, transparent);
+    }
+
+    .case-card:hover::before {
+      opacity: 1;
+    }
+
+    .case-card:hover::after {
+      opacity: 1;
+      transform: translateX(45%);
+    }
+
+    .case-image {
+      aspect-ratio: 3 / 4;
+      background: var(--surface-2);
+    }
+
+    .case-image,
+    .case-body {
+      position: relative;
+      z-index: 2;
+    }
+
+    .case-video {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      background: var(--surface-2);
+    }
+
+    .case-video:fullscreen,
+    .case-video:-webkit-full-screen {
+      object-fit: contain;
+      background: #000;
+    }
+
+    .case-body {
+      padding: 20px;
+    }
+
+    .case-body h3 {
+      margin: 0 0 10px;
+      font-size: 24px;
+      letter-spacing: 0;
+    }
+
+    .case-body p {
+      margin: 0;
+      color: var(--muted);
+      overflow-wrap: anywhere;
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: clamp(28px, 6vw, 72px);
+    }
+
+    .skill-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 24px;
+    }
+
+    .skill {
+      padding: 9px 12px;
+      border-radius: 12px;
+      border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--line));
+      background: color-mix(in srgb, var(--accent) 8%, transparent);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 700;
+      transition: transform 220ms var(--ease-out), border-color 180ms ease, background 180ms ease;
+    }
+
+    .skill:hover {
+      transform: translateY(-2px);
+      border-color: color-mix(in srgb, var(--accent) 55%, var(--line));
+      background: color-mix(in srgb, var(--accent) 12%, transparent);
+    }
+
+    .contact-list {
+      display: grid;
+      gap: 0;
+      margin: 0 0 28px;
+      padding: 0;
+      list-style: none;
+      border-top: 1px solid var(--line);
+    }
+
+    .contact-list li {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 20px;
+      padding: 18px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .contact-list span:first-child {
+      color: var(--dim);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-weight: 800;
+    }
+
+    .contact-list a:hover {
+      color: var(--accent);
+    }
+
+    .contact-list a,
+    .contact-list span {
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+
+    footer {
+      border-top: 1px solid var(--line);
+      padding: 46px 0;
+      color: var(--muted);
+    }
+
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .footer-mark {
+      color: var(--text);
+      font-size: clamp(36px, 8vw, 88px);
+      line-height: 1;
+      font-weight: 950;
+      letter-spacing: 0;
+    }
+
+    .reveal {
+      opacity: 1;
+      transform: none;
+      filter: none;
+      transition: opacity 760ms ease, transform 760ms var(--ease-out), filter 760ms ease;
+      will-change: opacity, transform, filter;
+    }
+
+    body.js-ready .reveal {
+      opacity: 0;
+      transform: translateY(28px) scale(0.985);
+      filter: blur(8px);
+    }
+
+    body.js-ready .reveal.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
+    }
+
+    .media-placeholder {
+      width: 100%;
+      height: 100%;
+      min-height: 220px;
+      display: grid;
+      place-items: center;
+      border-radius: inherit;
+      color: color-mix(in srgb, var(--text) 68%, transparent);
+      background:
+        linear-gradient(110deg, transparent 0 42%, rgba(255,255,255,0.08) 48%, transparent 56%),
+        repeating-linear-gradient(0deg, rgba(255,255,255,0.055) 0 1px, transparent 1px 9px),
+        radial-gradient(circle at 28% 18%, color-mix(in srgb, var(--accent-2) 18%, transparent), transparent 35%),
+        radial-gradient(circle at 78% 74%, color-mix(in srgb, var(--accent-3) 13%, transparent), transparent 42%),
+        linear-gradient(135deg, color-mix(in srgb, var(--surface-2) 88%, transparent), color-mix(in srgb, var(--surface-3) 78%, transparent));
+      border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--line));
+      text-align: center;
+      padding: 24px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .media-placeholder::before {
+      content: "";
+      position: absolute;
+      inset: 14px;
+      border: 1px solid color-mix(in srgb, var(--text) 12%, transparent);
+      border-radius: calc(var(--radius) - 8px);
+      pointer-events: none;
+    }
+
+    .media-placeholder::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: -18%;
+      height: 18%;
+      background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--accent-2) 18%, transparent), transparent);
+      animation: scanline 5.2s linear infinite;
+      pointer-events: none;
+    }
+
+    .media-placeholder span {
+      position: relative;
+      z-index: 1;
+      text-shadow: 0 0 26px color-mix(in srgb, var(--accent) 38%, transparent);
+    }
+
+    @keyframes scanline {
+      0% { transform: translateY(0); opacity: 0; }
+      12% { opacity: 1; }
+      78% { opacity: 0.55; }
+      100% { transform: translateY(720%); opacity: 0; }
+    }
+
+    .showreel > .media-placeholder,
+    .work-media .media-placeholder,
+    .workflow-visual .media-placeholder,
+    .case-image .media-placeholder {
+      min-height: 100%;
+    }
+
+    .prototype-disabled {
+      cursor: default;
+      opacity: 0.72;
+    }
+
+    @media (max-width: 840px) {
+      .page-shell {
+        width: min(calc(100% - 32px), var(--max));
+      }
+
+      .topbar-inner {
+        min-height: 68px;
+        gap: 12px;
+      }
+
+      .menu-button {
+        display: inline-flex;
+      }
+
+      .nav {
+        position: fixed;
+        inset: 68px 16px auto 16px;
+        display: none;
+        flex-direction: column;
+        align-items: stretch;
+        padding: 12px;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: var(--surface);
+        box-shadow: var(--shadow);
+      }
+
+      .nav.is-open {
+        display: flex;
+      }
+
+      .nav a {
+        justify-content: flex-start;
+        min-height: 46px;
+      }
+
+      .hero {
+        min-height: auto;
+        padding: 58px 0 72px;
+        overflow: hidden;
+      }
+
+      .hero-copy {
+        max-width: 100%;
+        font-size: clamp(17px, 4.8vw, 20px);
+      }
+
+      .hero-actions {
+        width: 100%;
+      }
+
+      .button {
+        min-width: 0;
+        white-space: nowrap;
+      }
+
+      .hero-grid,
+      .section-head,
+      .workflow,
+      .about-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-panel {
+        margin-top: 24px;
+      }
+
+      .focus-list li {
+        display: grid;
+        grid-template-columns: minmax(82px, max-content) minmax(0, 1fr);
+        align-items: start;
+      }
+
+      .focus-list span {
+        text-align: right;
+        line-height: 1.55;
+        overflow-wrap: anywhere;
+      }
+
+      .case-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .works-rail-wrap {
+        margin-inline: -16px;
+        padding-inline: 16px;
+      }
+
+      .works-grid {
+        grid-auto-columns: min(82vw, 360px);
+      }
+
+      .work-meta {
+        grid-template-rows: auto minmax(6.2em, auto) auto;
+      }
+
+      .work-meta h3 {
+        font-size: clamp(22px, 6.2vw, 30px);
+      }
+
+      .workflow-visual {
+        position: static;
+      }
+
+      .showreel-content {
+        inset: auto 18px 18px 18px;
+        align-items: start;
+        flex-direction: column;
+      }
+
+      .play-badge {
+        width: 58px;
+        height: 58px;
+        font-size: 24px;
+      }
+
+      .contact-list li {
+        grid-template-columns: 1fr;
+        gap: 6px;
+      }
+
+      .footer-inner {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .brand {
+        gap: 8px;
+        min-width: 0;
+        font-size: 22px;
+      }
+
+      .brand small {
+        font-size: 11px;
+        letter-spacing: 0.1em;
+        overflow-wrap: anywhere;
+      }
+
+      .hero-actions {
+        display: grid;
+        grid-template-columns: 1fr;
+      }
+
+      .button {
+        width: 100%;
+        padding-inline: 16px;
+      }
+
+      .focus-list li {
+        grid-template-columns: 1fr;
+        gap: 4px;
+      }
+
+      .focus-list span {
+        text-align: left;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      .ambient-field,
+      .cursor-light {
+        display: none;
+      }
+
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: 0.001ms !important;
+      }
+
+      .reveal {
+        opacity: 1;
+        transform: none;
+        filter: none;
+      }
+    }
+
+    @media (hover: none), (pointer: coarse) {
+      .cursor-light {
+        display: none;
+      }
+
+      .work-card:hover,
+      .case-card:hover,
+      .showreel:hover,
+      .hero-panel:hover,
+      .button:hover,
+      .skill:hover {
+        transform: none;
+      }
+    }
+
+    /* NEO cyber art direction */
+    body.neo-interface {
+      --bg: #0e0e0e;
+      --surface: rgba(28, 27, 27, 0.68);
+      --surface-2: rgba(19, 19, 19, 0.88);
+      --surface-3: #2a2a2a;
+      --text: #e5e2e1;
+      --muted: #bac9cc;
+      --dim: #849396;
+      --line: rgba(0, 229, 255, 0.26);
+      --accent: #00e5ff;
+      --accent-2: #c3f5ff;
+      --accent-3: #f3bf26;
+      --accent-ink: #00363d;
+      --radius: 4px;
+      --max: 1280px;
+      background: #0e0e0e;
+      font-family: "Geist", "Inter", "Microsoft YaHei", "PingFang SC", sans-serif;
+      selection-color: #00363d;
+    }
+
+    .neo-interface .motion-canvas {
+      z-index: 0;
+      opacity: 0.85;
+      mix-blend-mode: normal;
+      background: #0e0e0e;
+    }
+
+    .neo-interface .ambient-field {
+      opacity: 0.38;
+      background:
+        radial-gradient(circle at 18% 26%, rgba(0,229,255,0.12), transparent 34rem),
+        radial-gradient(circle at 82% 72%, rgba(243,191,38,0.08), transparent 32rem);
+    }
+
+    .neo-interface .ambient-field::before,
+    .neo-interface .ambient-field::after {
+      opacity: 0.22;
+    }
+
+    .neo-interface .scroll-progress {
+      height: 4px;
+      background: linear-gradient(90deg, #00e5ff, #c3f5ff, #f3bf26);
+      box-shadow: 0 0 28px rgba(0, 229, 255, 0.45);
+    }
+
+    .neo-interface .topbar {
+      background: rgba(14, 14, 14, 0.62);
+      border-bottom-color: rgba(0, 229, 255, 0.2);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+
+    .neo-interface .topbar-inner {
+      min-height: 76px;
+    }
+
+    .neo-interface .brand {
+      color: var(--text);
+      font-size: 26px;
+      letter-spacing: -0.03em;
+      text-shadow: none;
+    }
+
+    .neo-interface .brand small {
+      color: var(--muted);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      letter-spacing: 0.16em;
+    }
+
+    .neo-interface .nav a {
+      border-radius: 0;
+      color: var(--muted);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      letter-spacing: 0.08em;
+      position: relative;
+    }
+
+    .neo-interface .nav a::after {
+      content: "";
+      position: absolute;
+      left: 14px;
+      right: 14px;
+      bottom: 5px;
+      height: 2px;
+      transform: scaleX(0);
+      transform-origin: left;
+      background: var(--accent);
+      transition: transform 220ms ease;
+    }
+
+    .neo-interface .nav a:hover {
+      color: var(--accent);
+      background: transparent;
+      border-color: transparent;
+    }
+
+    .neo-interface .nav a:hover::after {
+      transform: scaleX(1);
+    }
+
+    .neo-interface .edit-button,
+    .neo-interface .icon-button,
+    .neo-interface .button {
+      border-radius: 2px;
+      font-family: "JetBrains Mono", Consolas, monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .neo-interface .edit-button.is-active,
+    .neo-interface .button.primary {
+      color: #00363d;
+      background: #00e5ff;
+      box-shadow: 0 0 34px rgba(0, 229, 255, 0.22);
+    }
+
+    .neo-interface .hero {
+      min-height: calc(100vh - 76px);
+      padding-top: clamp(72px, 9vw, 128px);
+    }
+
+    .neo-interface .hero::before {
+      content: "PORTFOLIO / 2026";
+      color: rgba(186,201,204,0.62);
+      font-family: "JetBrains Mono", Consolas, monospace;
+    }
+
+    .neo-interface .hero::after {
+      background: linear-gradient(90deg, transparent, var(--accent), var(--accent-3));
+      bottom: 38px;
+    }
+
+    .neo-interface .eyebrow,
+    .neo-interface .kicker {
+      color: var(--accent);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      letter-spacing: 0.3em;
+    }
+
+    .neo-interface h1,
+    .neo-interface h2,
+    .neo-interface h3,
+    .neo-interface .footer-mark {
+      font-family: "Syne", "Arial Black", "Microsoft YaHei", sans-serif;
+      text-transform: uppercase;
+      letter-spacing: -0.02em;
+    }
+
+    .neo-interface h1 {
+      font-size: clamp(72px, 12vw, 158px);
+      line-height: 0.82;
+    }
+
+    .neo-interface .hero-name {
+      color: var(--text);
+    }
+
+    .neo-interface .hero-roman {
+      background: linear-gradient(98deg, #00e5ff, #9cf0ff 40%, #f3bf26);
+      background-clip: text;
+      -webkit-background-clip: text;
+      filter: drop-shadow(0 18px 46px rgba(0,229,255,0.18));
+    }
+
+    .neo-interface .hero-copy {
+      color: rgba(229,226,225,0.78);
+      font-size: clamp(18px, 2.1vw, 26px);
+      max-width: 680px;
+    }
+
+    .neo-interface .hero-panel,
+    .neo-interface .showreel,
+    .neo-interface .work-media,
+    .neo-interface .workflow-visual,
+    .neo-interface .case-card,
+    .neo-interface .design-panel,
+    .neo-interface .edit-toolbar {
+      position: relative;
+      border: 1px solid rgba(0, 229, 255, 0.3);
+      border-radius: 2px;
+      background: rgba(28, 27, 27, 0.5);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 24px 80px rgba(0,0,0,0.32);
+    }
+
+    .neo-interface .hero-panel::before,
+    .neo-interface .showreel::before,
+    .neo-interface .work-media::before,
+    .neo-interface .workflow-visual::before,
+    .neo-interface .case-card::before {
+      content: "";
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      width: 16px;
+      height: 16px;
+      border-top: 2px solid var(--accent);
+      border-left: 2px solid var(--accent);
+      z-index: 3;
+      pointer-events: none;
+      background: transparent;
+      opacity: 1;
+    }
+
+    .neo-interface .hero-panel::after,
+    .neo-interface .work-media::after,
+    .neo-interface .workflow-visual::after,
+    .neo-interface .case-card::after {
+      content: "";
+      position: absolute;
+      right: -2px;
+      bottom: -2px;
+      width: 16px;
+      height: 16px;
+      border-right: 2px solid var(--accent);
+      border-bottom: 2px solid var(--accent);
+      z-index: 3;
+      pointer-events: none;
+      background: transparent;
+      opacity: 1;
+      transform: none;
+    }
+
+    .neo-interface .hero-panel {
+      padding: 28px;
+      overflow: hidden;
+    }
+
+    .neo-interface .hero-panel:hover,
+    .neo-interface .showreel:hover,
+    .neo-interface .work-card:hover,
+    .neo-interface .case-card:hover {
+      box-shadow: 0 28px 110px rgba(0, 229, 255, 0.12);
+    }
+
+    .neo-interface .focus-list li {
+      border-bottom-color: rgba(186,201,204,0.18);
+      font-family: "Geist", "Microsoft YaHei", sans-serif;
+    }
+
+    .neo-interface .focus-list strong {
+      color: var(--text);
+    }
+
+    .neo-interface .focus-list span {
+      color: rgba(229,226,225,0.7);
+    }
+
+    .neo-interface .section {
+      padding: clamp(96px, 12vw, 168px) 0;
+    }
+
+    .neo-interface .section-head {
+      grid-template-columns: 1fr;
+      text-align: center;
+      gap: 18px;
+      justify-items: center;
+    }
+
+    .neo-interface .section-head h2 {
+      font-size: clamp(38px, 7vw, 72px);
+      font-style: italic;
+    }
+
+    .neo-interface .section-head::after {
+      content: "";
+      width: 96px;
+      height: 4px;
+      background: var(--accent);
+      box-shadow: 0 0 26px rgba(0,229,255,0.34);
+    }
+
+    .neo-interface .showreel {
+      min-height: min(56vw, 620px);
+      border-color: rgba(0, 229, 255, 0.32);
+    }
+
+    .neo-interface .showreel::before {
+      transform: none;
+    }
+
+    .neo-interface .showreel-content {
+      inset: auto 32px 32px 32px;
+    }
+
+    .neo-interface .play-badge {
+      border-radius: 2px;
+      background: var(--accent);
+      color: #00363d;
+    }
+
+    .neo-interface .works-grid {
+      display: grid;
+      grid-auto-flow: row;
+      grid-auto-columns: initial;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 32px;
+      padding-top: 18px;
+      overflow: visible;
+      scroll-snap-type: none;
+    }
+
+    .neo-interface .works-rail-wrap {
+      margin-inline: 0;
+      padding-inline: 0;
+      overflow: visible;
+    }
+
+    .neo-interface .works-rail-wrap::after {
+      display: none;
+    }
+
+    .neo-interface .work-card {
+      gap: 20px;
+      scroll-snap-align: none;
+    }
+
+    .neo-interface .work-card:nth-child(2n) {
+      transform: translateY(28px);
+    }
+
+    .neo-interface .work-card:nth-child(2n):hover {
+      transform: translateY(14px) scale(1.018) rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
+    }
+
+    .neo-interface .work-media {
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+    }
+
+    .neo-interface .media-placeholder {
+      border: 0;
+      border-radius: 0;
+      color: rgba(229,226,225,0.78);
+      background:
+        repeating-linear-gradient(0deg, rgba(0,229,255,0.045) 0 1px, transparent 1px 8px),
+        radial-gradient(circle at center, rgba(0,229,255,0.16), transparent 44%),
+        linear-gradient(135deg, rgba(28,27,27,0.86), rgba(14,14,14,0.94));
+      filter: grayscale(0.2);
+    }
+
+    .neo-interface .media-placeholder::before {
+      border-radius: 0;
+      border-color: rgba(0,229,255,0.22);
+    }
+
+    .neo-interface .work-meta {
+      border-top-color: rgba(186,201,204,0.18);
+    }
+
+    .neo-interface .tag,
+    .neo-interface .skill {
+      border-radius: 2px;
+      border-color: rgba(0,229,255,0.28);
+      color: var(--accent);
+      background: rgba(0,229,255,0.05);
+      font-family: "JetBrains Mono", Consolas, monospace;
+    }
+
+    .neo-interface .workflow {
+      align-items: center;
+    }
+
+    .neo-interface .step {
+      border-bottom-color: rgba(186,201,204,0.18);
+    }
+
+    .neo-interface .step-number {
+      border-radius: 2px;
+      color: #00363d;
+      background: var(--accent);
+      border-color: transparent;
+      font-family: "JetBrains Mono", Consolas, monospace;
+    }
+
+    .neo-interface .case-grid {
+      gap: 28px;
+    }
+
+    .neo-interface .case-image {
+      aspect-ratio: 1 / 1;
+      overflow: hidden;
+    }
+
+    .neo-interface .case-body {
+      padding: 24px;
+    }
+
+    .neo-interface .about-grid {
+      align-items: start;
+    }
+
+    .neo-interface .contact-list {
+      border-top-color: rgba(186,201,204,0.18);
+    }
+
+    .neo-interface .contact-list li {
+      border-bottom-color: rgba(186,201,204,0.18);
+    }
+
+    .neo-interface .contact-list span:first-child {
+      color: rgba(229,226,225,0.45);
+      font-family: "JetBrains Mono", Consolas, monospace;
+    }
+
+    .neo-interface .contact-list a:hover {
+      color: var(--accent);
+    }
+
+    .neo-interface footer {
+      background: rgba(19,19,19,0.5);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
+    .neo-interface .footer-mark {
+      font-size: clamp(64px, 11vw, 132px);
+    }
+
+    @media (max-width: 840px) {
+      .neo-interface h1 {
+        font-size: clamp(58px, 18vw, 96px);
+      }
+
+      .neo-interface .hero::before {
+        display: none;
+      }
+
+      .neo-interface .section-head {
+        text-align: left;
+        justify-items: start;
+      }
+
+      .neo-interface .works-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .neo-interface .work-card:nth-child(2n),
+      .neo-interface .work-card:nth-child(2n):hover {
+        transform: none;
+      }
+    }
+
+    /* Keep editor controls above the art-directed page UI. */
+    .neo-interface .design-panel {
+      position: fixed;
+      top: 88px;
+      right: 16px;
+      bottom: 88px;
+      z-index: 1000;
+      width: min(360px, calc(100vw - 32px));
+      max-height: none;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      padding: 16px;
+      background: rgba(19, 19, 19, 0.96);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+
+    .neo-interface .edit-toolbar {
+      position: fixed;
+      left: 50%;
+      right: auto;
+      bottom: 16px;
+      z-index: 1001;
+      max-width: calc(100vw - 32px);
+      flex-wrap: wrap;
+      justify-content: center;
+      transform: translateX(-50%);
+      background: rgba(19, 19, 19, 0.96);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+
+    .neo-interface .edit-toast {
+      z-index: 1002;
+    }
+
+    .neo-interface .design-panel textarea {
+      min-height: 72px;
+      max-height: 160px;
+    }
+
+    @media (max-width: 720px), (max-height: 760px) {
+      .neo-interface .design-panel {
+        left: 12px;
+        right: 12px;
+        top: 84px;
+        bottom: 112px;
+        width: auto;
+        padding: 12px;
+      }
+
+      .neo-interface .design-row,
+      .neo-interface .design-actions {
+        grid-template-columns: 1fr;
+      }
+
+      .neo-interface .edit-toolbar {
+        left: 12px;
+        right: 12px;
+        bottom: 10px;
+        max-width: none;
+        transform: none;
+      }
+
+      .neo-interface .edit-toolbar button {
+        flex: 1 1 130px;
+      }
+    }
+
+    /* Portfolio additions: photo frame, graphic gallery, and layout editor */
+    .hero-side-stack {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(150px, 210px);
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .profile-photo-frame {
+      position: relative;
+      min-height: 100%;
+      aspect-ratio: 3 / 4;
+      border: 1px solid rgba(0, 229, 255, 0.3);
+      border-radius: 2px;
+      overflow: hidden;
+      background:
+        repeating-linear-gradient(0deg, rgba(0,229,255,0.045) 0 1px, transparent 1px 8px),
+        radial-gradient(circle at center, rgba(0,229,255,0.18), transparent 48%),
+        rgba(28, 27, 27, 0.56);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 24px 80px rgba(0,0,0,0.32);
+    }
+
+    .profile-photo-frame::before,
+    .profile-photo-frame::after {
+      content: "";
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .profile-photo-frame::before {
+      top: -2px;
+      left: -2px;
+      border-top: 2px solid var(--accent);
+      border-left: 2px solid var(--accent);
+    }
+
+    .profile-photo-frame::after {
+      right: -2px;
+      bottom: -2px;
+      border-right: 2px solid var(--accent);
+      border-bottom: 2px solid var(--accent);
+    }
+
+    .profile-photo-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      filter: grayscale(1);
+      transition: opacity 260ms ease, filter 420ms ease, transform 720ms var(--ease-out);
+    }
+
+    .profile-photo-frame.has-photo img {
+      opacity: 0.9;
+    }
+
+    .profile-photo-frame:hover img {
+      filter: grayscale(0);
+      transform: scale(1.025);
+    }
+
+    .photo-placeholder {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      color: rgba(229,226,225,0.68);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .profile-photo-frame.has-photo .photo-placeholder {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .photo-upload-label {
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      bottom: 12px;
+      z-index: 4;
+      display: none;
+      min-height: 34px;
+      place-items: center;
+      border: 1px solid rgba(0,229,255,0.38);
+      color: var(--accent);
+      background: rgba(14,14,14,0.76);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 11px;
+      cursor: pointer;
+    }
+
+    body.edit-mode .photo-upload-label {
+      display: grid;
+    }
+
+    .photo-upload-label input {
+      display: none;
+    }
+
+    .graphic-gallery {
+      display: grid;
+      gap: 16px;
+      margin-bottom: 34px;
+    }
+
+    .graphic-main {
+      position: relative;
+      min-height: clamp(260px, 46vw, 560px);
+      border: 1px solid rgba(0, 229, 255, 0.3);
+      border-radius: 2px;
+      overflow: hidden;
+      background: rgba(28, 27, 27, 0.5);
+      box-shadow: 0 24px 80px rgba(0,0,0,0.32);
+    }
+
+    .graphic-main .media-placeholder {
+      min-height: clamp(260px, 46vw, 560px);
+    }
+
+    .graphic-main-caption {
+      position: absolute;
+      left: 24px;
+      bottom: 22px;
+      z-index: 3;
+      display: grid;
+      gap: 6px;
+      max-width: min(520px, calc(100% - 48px));
+      color: var(--text);
+      text-shadow: 0 10px 34px rgba(0,0,0,0.65);
+    }
+
+    .graphic-main-caption small {
+      color: var(--accent);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .graphic-main-caption strong {
+      font-family: "Syne", "Arial Black", "Microsoft YaHei", sans-serif;
+      font-size: clamp(24px, 4vw, 48px);
+      text-transform: uppercase;
+    }
+
+    .graphic-thumbs {
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: clamp(120px, 18vw, 190px);
+      gap: 12px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      overscroll-behavior-x: contain;
+      scrollbar-width: thin;
+      scrollbar-color: var(--accent) rgba(255,255,255,0.08);
+    }
+
+    .graphic-thumb {
+      min-height: 92px;
+      border: 1px solid rgba(0, 229, 255, 0.24);
+      border-radius: 2px;
+      padding: 12px;
+      color: rgba(229,226,225,0.78);
+      background:
+        repeating-linear-gradient(0deg, rgba(0,229,255,0.04) 0 1px, transparent 1px 8px),
+        rgba(28, 27, 27, 0.56);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 11px;
+      text-align: left;
+      cursor: pointer;
+      transition: border-color 180ms ease, color 180ms ease, transform 220ms var(--ease-out);
+    }
+
+    .graphic-thumb:hover,
+    .graphic-thumb.is-active {
+      color: var(--accent);
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    .layout-edit-target {
+      outline: 1px dashed rgba(243,191,38,0.56);
+      outline-offset: 5px;
+      cursor: move;
+    }
+
+    .layout-edit-target.is-layout-selected {
+      outline: 2px solid #f3bf26;
+      resize: both;
+      overflow: auto;
+      min-width: 48px;
+      min-height: 38px;
+    }
+
+    .layout-hint {
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+    }
+
+    .layout-hint h4 {
+      margin: 0 0 8px;
+      color: var(--text);
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .graphic-cover {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 8.2;
+      min-height: 300px;
+      margin: 0 0 clamp(40px, 6vw, 76px);
+      border: 1px solid rgba(0, 229, 255, 0.3);
+      border-radius: 2px;
+      overflow: hidden;
+      background: rgba(28, 27, 27, 0.5);
+      box-shadow: 0 24px 80px rgba(0,0,0,0.32);
+    }
+
+    .graphic-cover .media-placeholder {
+      min-height: 100%;
+      height: 100%;
+    }
+
+    .graphic-gallery {
+      width: 100%;
+      gap: 18px;
+      margin: 0 auto;
+    }
+
+    .graphic-main {
+      width: 100%;
+      min-height: clamp(360px, 50vw, 640px);
+    }
+
+    .graphic-main .media-placeholder {
+      min-height: clamp(360px, 50vw, 640px);
+    }
+
+    .graphic-thumbs {
+      grid-auto-columns: minmax(180px, 1fr);
+      grid-template-columns: repeat(5, minmax(160px, 1fr));
+      grid-auto-flow: initial;
+      overflow-x: auto;
+      justify-content: stretch;
+      width: 100%;
+    }
+
+    .graphic-thumb {
+      min-height: 112px;
+    }
+
+    .circular-gallery {
+      position: relative;
+      height: clamp(260px, 33vw, 430px);
+      margin-top: 18px;
+      overflow: hidden;
+      perspective: none;
+      cursor: grab;
+      touch-action: pan-y;
+      user-select: none;
+    }
+
+    .circular-gallery:active {
+      cursor: grabbing;
+    }
+
+    .circular-gallery::before,
+    .circular-gallery::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      z-index: 4;
+      width: 14%;
+      pointer-events: none;
+    }
+
+    .circular-gallery::before {
+      left: 0;
+      background: linear-gradient(90deg, #0e0e0e, transparent);
+    }
+
+    .circular-gallery::after {
+      right: 0;
+      background: linear-gradient(270deg, #0e0e0e, transparent);
+    }
+
+    .circular-gallery-item {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      display: grid;
+      align-content: end;
+      gap: 10px;
+      width: clamp(180px, 24vw, 310px);
+      height: clamp(150px, 21vw, 260px);
+      padding: 18px;
+      border: 1px solid rgba(0, 229, 255, 0.28);
+      border-radius: 6px;
+      color: rgba(229,226,225,0.72);
+      background:
+        repeating-linear-gradient(0deg, rgba(0,229,255,0.045) 0 1px, transparent 1px 8px),
+        radial-gradient(circle at 50% 32%, rgba(0,229,255,0.2), transparent 46%),
+        rgba(28, 27, 27, 0.68);
+      box-shadow: 0 24px 80px rgba(0,0,0,0.32);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      text-align: left;
+      transform: translate(-50%, -50%);
+      transform-style: preserve-3d;
+      transition: transform 520ms cubic-bezier(0.16, 1, 0.3, 1), opacity 420ms ease, border-color 220ms ease, color 220ms ease, filter 420ms ease;
+      cursor: pointer;
+    }
+
+    .circular-gallery-item::before,
+    .circular-gallery-item::after {
+      content: "";
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      pointer-events: none;
+    }
+
+    .circular-gallery-item::before {
+      top: -2px;
+      left: -2px;
+      border-top: 2px solid var(--accent);
+      border-left: 2px solid var(--accent);
+    }
+
+    .circular-gallery-item::after {
+      right: -2px;
+      bottom: -2px;
+      border-right: 2px solid var(--accent);
+      border-bottom: 2px solid var(--accent);
+    }
+
+    .circular-gallery-item span {
+      color: var(--accent);
+      font-size: 12px;
+      letter-spacing: 0.2em;
+    }
+
+    .circular-gallery-item strong {
+      font-family: "Syne", "Arial Black", "Microsoft YaHei", sans-serif;
+      font-size: clamp(20px, 2.4vw, 34px);
+      letter-spacing: -0.02em;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .circular-gallery-item.is-active {
+      color: #fff;
+      border-color: var(--accent);
+      filter: saturate(1.2);
+      z-index: 120 !important;
+    }
+
+    .gallery-nav {
+      position: absolute;
+      top: 50%;
+      z-index: 240;
+      width: 54px;
+      height: 54px;
+      border: 1px solid rgba(0, 229, 255, 0.46);
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      color: var(--accent);
+      background: rgba(14, 14, 14, 0.7);
+      box-shadow: 0 18px 50px rgba(0,0,0,0.32), 0 0 28px rgba(0,229,255,0.12);
+      font-size: 44px;
+      line-height: 1;
+      cursor: pointer;
+      pointer-events: auto;
+      transform: translateY(-50%);
+      transition: transform 180ms ease, border-color 180ms ease, background 180ms ease, color 180ms ease;
+    }
+
+    .gallery-nav:hover {
+      color: #00363d;
+      border-color: var(--accent);
+      background: var(--accent);
+      transform: translateY(-50%) scale(1.08);
+    }
+
+    .gallery-nav-prev {
+      left: clamp(12px, 5vw, 72px);
+    }
+
+    .gallery-nav-next {
+      right: clamp(12px, 5vw, 72px);
+    }
+
+    body.edit-mode .gallery-nav {
+      pointer-events: none;
+      opacity: 0.35;
+    }
+
+    @media (max-width: 720px) {
+      .gallery-nav {
+        width: 44px;
+        height: 44px;
+        font-size: 34px;
+      }
+    }
+
+    .circular-gallery-help {
+      margin-top: 8px;
+      color: rgba(186,201,204,0.62);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .graphic-gallery.circular-only {
+      margin-top: clamp(28px, 5vw, 56px);
+    }
+
+    .graphic-gallery.circular-only .circular-gallery {
+      height: clamp(320px, 40vw, 520px);
+    }
+
+    @media (max-width: 980px) {
+      .hero-side-stack {
+        grid-template-columns: 1fr;
+      }
+
+      .profile-photo-frame {
+        min-height: 280px;
+        aspect-ratio: 16 / 10;
+      }
+    }
+
+  </style>
+</head>
+<body class="neo-interface">
+  <div class="scroll-progress" aria-hidden="true"></div>
+  <canvas class="motion-canvas" id="motion-canvas" aria-hidden="true" width="2550" height="1275" style="width: 2040px; height: 1020px;"></canvas>
+  <div class="ambient-field" aria-hidden="true"></div>
+  <div class="cursor-light" aria-hidden="true"></div>
+  <header class="topbar">
+    <div class="page-shell topbar-inner">
+      <a class="brand" href="#top" aria-label="回到首页">
+        WUHAO <small data-edit-id="editable-000" class="">AI Video Design</small>
+      </a>
+      <nav class="nav" id="site-nav" aria-label="主导航">
+        <a href="#works" data-edit-id="editable-001" class="">作品</a>
+        <a href="#workflow" data-edit-id="editable-002" class="">平面设计</a>
+        <a href="#cases" data-edit-id="editable-003" class="">动漫设计</a>
+        <a href="#contact" data-edit-id="editable-004" class="">联系</a>
+      </nav>
+      <div style="display:flex; gap:8px;">
+        <button class="edit-button" id="edit-toggle" type="button" aria-pressed="false" style="">编辑</button>
+        <button class="icon-button" id="theme-toggle" type="button" aria-label="切换明暗主题" style="">☼</button>
+        <button class="icon-button menu-button" id="menu-toggle" type="button" aria-label="打开菜单" aria-controls="site-nav" aria-expanded="false">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="edit-toolbar" id="edit-toolbar" aria-label="编辑工具">
+    <button type="button" id="add-text-box">添加文字框</button>
+    <button type="button" id="export-html">导出HTML</button>
+    <button type="button" id="reset-edits">清除修改</button>
+    <button type="button" id="exit-edit">退出编辑</button>
+  </div>
+  <aside class="design-panel" id="design-panel" aria-label="文字设计面板" data-has-selection="">
+    <h3>文字设计</h3>
+    <p class="design-hint">进入编辑模式后，点击页面文字即可在这里修改样式。新增文字框可以直接拖动。</p>
+    <label>
+      文字内容
+      <textarea id="design-text" placeholder="请选择页面文字"></textarea>
+    </label>
+    <label id="design-link-wrap" style="display: none;">
+      链接地址
+      <input id="design-link" type="text" placeholder="https:// 或 mailto:">
+    </label>
+    <div class="design-row">
+      <label>
+        字号
+        <input id="design-font-size" type="number" min="10" max="180" step="1" placeholder="自动">
+      </label>
+      <label>
+        宽度
+        <input id="design-width" type="number" min="40" max="1200" step="1" placeholder="自动">
+      </label>
+    </div>
+    <div class="design-row">
+      <label>
+        文字颜色
+        <input id="design-color" type="color" value="#f6f3ee">
+      </label>
+      <label>
+        背景颜色
+        <input id="design-bg" type="color" value="#111114">
+      </label>
+    </div>
+    <div class="design-row">
+      <label>
+        内边距
+        <input id="design-padding" type="number" min="0" max="80" step="1" placeholder="自动">
+      </label>
+      <label>
+        对齐
+        <select id="design-align">
+          <option value="">默认</option>
+          <option value="left">左对齐</option>
+          <option value="center">居中</option>
+          <option value="right">右对齐</option>
+        </select>
+      </label>
+    </div>
+    <div class="design-actions">
+      <button type="button" id="design-bold">加粗</button>
+      <button type="button" id="design-clear-style">清除样式</button>
+      <button type="button" id="design-delete" disabled="">删除文字框</button>
+      <button type="button" id="design-close">收起面板</button>
+    </div>
+    <div class="layout-hint">
+      <h4>元素布局</h4>
+      <p class="design-hint">点击任意方框/区域可拖动位置，选中后可调整 X、Y、宽、高。</p>
+      <div class="design-row">
+        <label>X<input id="layout-x" type="number" step="1" placeholder="自动"></label>
+        <label>Y<input id="layout-y" type="number" step="1" placeholder="自动"></label>
+      </div>
+      <div class="design-row">
+        <label>宽<input id="layout-width" type="number" min="20" step="1" placeholder="自动"></label>
+        <label>高<input id="layout-height" type="number" min="20" step="1" placeholder="自动"></label>
+      </div>
+      <div class="design-actions">
+        <button type="button" id="layout-reset">重置元素</button>
+        <button type="button" id="layout-lock">取消选择</button>
+      </div>
+    </div>
+  </aside>
+  <div class="edit-toast" id="edit-toast" role="status" aria-live="polite">已进入设计编辑模式，点击文字后在右侧面板调整。</div>
+
+  <main id="top">
+    <section class="hero page-shell">
+      <div class="hero-grid">
+        <div class="reveal" style="transition-delay: 0ms;">
+          <span class="eyebrow" data-edit-id="editable-005">AIGC VIDEO DESIGNER</span>
+          <h1>
+            <span class="hero-name" data-edit-id="editable-006" style="font-weight: 700; font-size: 150px; padding: 17px; text-align: left;">伍浩</span>
+            <span class="hero-roman" data-edit-id="editable-007" style="font-size: 150px; text-align: left;">WUHAO</span>
+          </h1>
+          <p class="hero-copy" data-edit-id="editable-008">精通全流程AIGC制作，具有丰富的试听语言和导演思维以及项目实战经验。同时具有优秀的艺术审美意识。</p>
+          <div class="hero-actions">
+            <a class="button primary" href="#works" data-edit-id="editable-009">查看作品 ↓</a>
+            <span class="button prototype-disabled" aria-disabled="true" style="">下载 PDF 简历</span>
+            <a class="button" href="mailto:3115362321@qq.com" data-edit-id="editable-010" style="">联系合作</a>
+          </div>
+        </div>
+        <div class="hero-side-stack reveal" style="transition-delay: 45ms;">
+          <aside class="hero-panel" aria-label="能力概览">
+            <span class="kicker" data-edit-id="editable-011">Focus</span>
+            <ul class="focus-list">
+              <li><strong data-edit-id="editable-012" class="">AIGC 影像</strong><span data-edit-id="editable-013" class=""></span></li>
+              <li><strong data-edit-id="editable-014" class="">平面设计</strong><span data-edit-id="editable-015" class=""></span></li>
+              <li><strong data-edit-id="editable-016" class="">动漫设计</strong><span data-edit-id="editable-017" class=""></span></li>
+              <li><strong data-edit-id="editable-018" class="">后期完成</strong><span data-edit-id="editable-019" class=""></span></li>
+            </ul>
+          </aside>
+          <aside class="profile-photo-frame" id="profile-photo-frame" aria-label="个人照片框">
+            <img id="profile-photo-img" alt="WUHAO 个人照片">
+            <div class="photo-placeholder" data-edit-id="editable-photo-placeholder">PERSONAL PHOTO</div>
+            <label class="photo-upload-label">嵌入照片<input id="profile-photo-input" type="file" accept="image/*"></label>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="section page-shell" id="showreel">
+      <div class="showreel reveal" aria-label="2026 作品集混剪原型占位" style="transition-delay: 90ms;">
+        <div class="media-placeholder" role="img" aria-label="WUHAO AI 视频作品集封面"><span data-edit-id="editable-020" class="">WUHAO AI 视频作品集封面</span></div>
+        <div class="showreel-content">
+          <div>
+            <span class="kicker" style="color:rgba(246,243,238,0.62)" data-edit-id="editable-021">2026 Showreel</span>
+            <h3 data-edit-id="editable-022" class="">作品总览</h3>
+            <p data-edit-id="editable-023" class="">过往作品混剪</p>
+          </div>
+          <span class="play-badge" aria-hidden="true">▶</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section page-shell" id="works">
+      <div class="section-head reveal" style="transition-delay: 135ms;">
+        <div>
+          <span class="kicker" data-edit-id="editable-024">Selected Works</span>
+          <h2 data-edit-id="editable-025" class="">作品集</h2>
+        </div>
+      </div>
+
+      <div class="works-rail-wrap">
+        <div class="works-grid" aria-label="作品网格">
+          <article class="work-card reveal" style="transition-delay: 180ms; --tilt-x: 0deg; --tilt-y: 0deg;">
+            <div class="work-media">
+              <div class="media-placeholder" role="img" aria-label="AI 漫剧项目封面"><span data-edit-id="editable-026" class="">AI 漫剧项目封面</span></div>
+            </div>
+            <div class="work-meta">
+              <h3 data-edit-id="editable-027" class="">AI 漫剧项目（已上线）</h3>
+              <p data-edit-id="editable-028" class="">该项目为《别惹我，我防御拉满》，目前红果热度3400W，抖音短剧双强榜TOP11，该项目从分镜到剪辑均由我统筹完成。</p>
+              <div class="tag-row">
+                <span class="tag" data-edit-id="editable-029">AIGC Video</span>
+                <span class="tag" data-edit-id="editable-030">Video Editing</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="work-card reveal" style="transition-delay: 225ms; --tilt-x: 0deg; --tilt-y: 0deg;">
+            <div class="work-media">
+              <div class="media-placeholder" role="img" aria-label="二维漫剧封面"><span data-edit-id="editable-031" class="">二维漫剧封面</span></div>
+            </div>
+            <div class="work-meta">
+              <h3 data-edit-id="editable-032" class="">二维漫剧</h3>
+              <p data-edit-id="editable-033" class="">《别惹我，我防御拉满》的二维画风尝试，后因平台政策转变为3D画风。</p>
+              <div class="tag-row">
+                <span class="tag" data-edit-id="editable-034">AIGC Video</span>
+                <span class="tag" data-edit-id="editable-035">Video Editing</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="work-card reveal" style="transition-delay: 260ms;">
+            <div class="work-media">
+              <div class="media-placeholder" role="img" aria-label="个人实验短片《提线》封面"><span data-edit-id="editable-036" class="">个人实验短片《提线》封面</span></div>
+            </div>
+            <div class="work-meta">
+              <h3 data-edit-id="editable-037" class="">个人实验短片《提线》</h3>
+              <p data-edit-id="editable-038" class="">全AI流程的一次实验，从创意、剧本、分镜、提示词均由AI生成，最后剪辑成片。</p>
+              <div class="tag-row">
+                <span class="tag" data-edit-id="editable-039">AIGC Video</span>
+                <span class="tag" data-edit-id="editable-040">Compositing</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="work-card reveal" style="transition-delay: 260ms; --tilt-x: 0deg; --tilt-y: 0deg;">
+            <div class="work-media">
+              <div class="media-placeholder" role="img" aria-label="海外真人短剧封面"><span data-edit-id="editable-041" class="">海外真人短剧封面</span></div>
+            </div>
+            <div class="work-meta">
+              <h3 data-edit-id="editable-042" class="">海外真人短剧</h3>
+              <p data-edit-id="editable-043" class="">海外实验真人短剧。</p>
+              <div class="tag-row">
+                <span class="tag" data-edit-id="editable-044">Short Video</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="work-card reveal" style="transition-delay: 260ms;">
+            <div class="work-media">
+              <div class="media-placeholder" role="img" aria-label="作品 05 封面"><span data-edit-id="editable-045" class="">作品 05 封面</span></div>
+            </div>
+            <div class="work-meta">
+              <h3 data-edit-id="editable-046" class="">05</h3>
+              <p data-edit-id="editable-047" class="">项目占位：后续替换为真实作品标题、职责说明和视频链接。</p>
+              <div class="tag-row">
+                <span class="tag" data-edit-id="editable-048">Spatial Media</span>
+                <span class="tag" data-edit-id="editable-049">AIGC</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="work-card reveal" style="transition-delay: 260ms; --tilt-x: 0deg; --tilt-y: 0deg;">
+            <div class="work-media">
+              <div class="media-placeholder" role="img" aria-label="作品 06 封面"><span data-edit-id="editable-050" class="">作品 06 封面</span></div>
+            </div>
+            <div class="work-meta">
+              <h3 data-edit-id="editable-051" class="">06</h3>
+              <p data-edit-id="editable-052" class="">项目占位：后续替换为真实作品标题、职责说明和视频链接。</p>
+              <div class="tag-row">
+                <span class="tag" data-edit-id="editable-053">Showreel</span>
+                <span class="tag" data-edit-id="editable-054">Post Production</span>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section page-shell" id="workflow">
+      <div class="section-head reveal" style="transition-delay: 260ms;">
+        <div>
+          <span class="kicker" data-edit-id="editable-055">Graphic Portfolio</span>
+          <h2 data-edit-id="editable-056" class="">平面设计作品集</h2>
+        </div>
+        <p class="section-note" data-edit-id="editable-057">整理视觉识别、版式、海报、界面与视觉系统相关作品，呈现从概念到成稿的平面设计能力。</p>
+      </div>
+
+      <div class="graphic-gallery reveal circular-only" id="graphic-gallery" style="transition-delay: 260ms;" aria-label="平面设计图片预览">
+        <div class="circular-gallery" id="graphic-thumbs" aria-label="滚轮左右切换平面设计图片">
+          <button class="gallery-nav gallery-nav-prev" id="gallery-prev" type="button" aria-label="上一张">‹</button>
+          <button class="gallery-nav gallery-nav-next" id="gallery-next" type="button" aria-label="下一张">›</button>
+          <button class="graphic-thumb circular-gallery-item is-active" type="button" data-title="平面设计作品 01" data-name="VISUAL SYSTEM"><span>01</span><strong>VISUAL SYSTEM</strong></button>
+          <button class="graphic-thumb circular-gallery-item" type="button" data-title="平面设计作品 02" data-name="POSTER SERIES"><span>02</span><strong>POSTER SERIES</strong></button>
+          <button class="graphic-thumb circular-gallery-item" type="button" data-title="平面设计作品 03" data-name="BRAND LAYOUT"><span>03</span><strong>BRAND LAYOUT</strong></button>
+          <button class="graphic-thumb circular-gallery-item" type="button" data-title="平面设计作品 04" data-name="INTERFACE STUDY"><span>04</span><strong>INTERFACE STUDY</strong></button>
+          <button class="graphic-thumb circular-gallery-item" type="button" data-title="平面设计作品 05" data-name="TYPE EXPERIMENT"><span>05</span><strong>TYPE EXPERIMENT</strong></button>
+        </div>
+      </div>
+    </section>
+
+    <section class="section page-shell" id="cases">
+      <div class="section-head reveal" style="transition-delay: 260ms;">
+        <div>
+          <span class="kicker" data-edit-id="editable-067">Anime Portfolio</span>
+          <h2 data-edit-id="editable-068" class="">动漫设计作品集</h2>
+        </div>
+        <p class="section-note" data-edit-id="editable-069">展示角色、场景、视觉概念与动画风格相关作品，突出动漫设计方向的画面表达。</p>
+      </div>
+
+      <div class="case-grid">
+        <article class="case-card reveal" style="transition-delay: 260ms;">
+          <div class="case-image">
+            <div class="media-placeholder" role="img" aria-label="吴冠中新媒体展览封面"><span data-edit-id="editable-070" class="">吴冠中新媒体展览封面</span></div>
+          </div>
+          <div class="case-body">
+            <h3 data-edit-id="editable-071" class="">吴冠中 新媒体展览</h3>
+            <p data-edit-id="editable-072" class="">负责吴冠中先生个人展览的新媒体部分的动画二创制作，让人们充分体会画面意境。</p>
+            <div class="tag-row">
+              <span class="tag" data-edit-id="editable-073">After Effect</span>
+              <span class="tag" data-edit-id="editable-074">Motion Design</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="case-card reveal" style="transition-delay: 260ms;">
+          <div class="case-image">
+            <div class="media-placeholder" role="img" aria-label="深圳大学 40 周年投影秀封面"><span data-edit-id="editable-075" class="">深圳大学 40 周年投影秀封面</span></div>
+          </div>
+          <div class="case-body">
+            <h3 data-edit-id="editable-076" class="">深圳大学 40 周年投影秀</h3>
+            <p data-edit-id="editable-077" class="">参与大型建筑投影视觉内容制作，将 AI 生成画面与空间叙事结合，服务现场节庆氛围。</p>
+            <div class="tag-row">
+              <span class="tag" data-edit-id="editable-078">Projection Mapping</span>
+              <span class="tag" data-edit-id="editable-079">Event Visual</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="case-card reveal" style="transition-delay: 260ms;">
+          <div class="case-image">
+            <div class="media-placeholder" role="img" aria-label="对话媒介建筑投影秀封面"><span data-edit-id="editable-080" class="">对话媒介建筑投影秀封面</span></div>
+          </div>
+          <div class="case-body">
+            <h3 data-edit-id="editable-081" class="">对话媒介建筑投影秀</h3>
+            <p data-edit-id="editable-082" class="">探索数字媒介与建筑空间之间的关系，通过沉浸式视觉、节奏和尺度建立现场观看体验。</p>
+            <div class="tag-row">
+              <span class="tag" data-edit-id="editable-083">Spatial Media</span>
+              <span class="tag" data-edit-id="editable-084">Visual Storytelling</span>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section page-shell" id="contact">
+      <div class="about-grid">
+        <div class="reveal" style="transition-delay: 260ms;">
+          <span class="kicker" data-edit-id="editable-085">Technical Palette</span>
+          <h2 data-edit-id="editable-086" class="">熟练的技能</h2>
+          <div class="skill-list" aria-label="技能标签">
+            <span class="skill" data-edit-id="editable-087">After Effects</span>
+            <span class="skill" data-edit-id="editable-088">Premiere Pro</span>
+            <span class="skill" data-edit-id="editable-089">Photoshop</span>
+            <span class="skill" data-edit-id="editable-090">Midjourney</span>
+            <span class="skill" data-edit-id="editable-091">ComfyUI</span>
+            <span class="skill" data-edit-id="editable-092">Runway</span>
+            <span class="skill" data-edit-id="editable-093">Seedance</span>
+            <span class="skill" data-edit-id="editable-094">Nanobanana</span>
+            <span class="skill" data-edit-id="editable-095">Vibe Coding</span>
+          </div>
+        </div>
+        <div class="reveal" style="transition-delay: 260ms;">
+          <span class="kicker" data-edit-id="editable-096">Contact</span>
+          <h2 data-edit-id="editable-097" class="">项目合作or工作机会</h2>
+          <ul class="contact-list">
+            <li>
+              <span data-edit-id="editable-098" class="">Email</span>
+              <a href="mailto:3115362321@qq.com" data-edit-id="editable-099" class="">3115362321@qq.com</a>
+            </li>
+            <li>
+              <span data-edit-id="editable-100" class="">WeChat</span>
+              <span data-edit-id="editable-101" class="">WH3115362321</span>
+            </li>
+            <li>
+              <span data-edit-id="editable-102" class="">Phone</span>
+              <a href="tel:18173754824" data-edit-id="editable-103" class="">18173754824</a>
+            </li>
+          </ul>
+          <div class="hero-actions" style="margin-top:0;">
+            <span class="button prototype-disabled" aria-disabled="true">下载 PDF 简历</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="page-shell footer-inner">
+      <div class="footer-mark" data-edit-id="editable-104">WUHAO</div>
+      <p data-edit-id="editable-105" class="">© 2026 WUHAO AI VIDEO DESIGN. 保持克制，追求极致。</p>
+    </div>
+  </footer>
+
+  <script>
+    const nav = document.querySelector("#site-nav");
+    const menuButton = document.querySelector("#menu-toggle");
+    const themeButton = document.querySelector("#theme-toggle");
+    const editButton = document.querySelector("#edit-toggle");
+    const exitEditButton = document.querySelector("#exit-edit");
+    const resetEditsButton = document.querySelector("#reset-edits");
+    const exportHtmlButton = document.querySelector("#export-html");
+    const addTextBoxButton = document.querySelector("#add-text-box");
+    const editToast = document.querySelector("#edit-toast");
+    const designPanel = document.querySelector("#design-panel");
+    const designText = document.querySelector("#design-text");
+    const designLinkWrap = document.querySelector("#design-link-wrap");
+    const designLink = document.querySelector("#design-link");
+    const designFontSize = document.querySelector("#design-font-size");
+    const designWidth = document.querySelector("#design-width");
+    const designColor = document.querySelector("#design-color");
+    const designBg = document.querySelector("#design-bg");
+    const designPadding = document.querySelector("#design-padding");
+    const designAlign = document.querySelector("#design-align");
+    const designBold = document.querySelector("#design-bold");
+    const designClearStyle = document.querySelector("#design-clear-style");
+    const designDelete = document.querySelector("#design-delete");
+    const designClose = document.querySelector("#design-close");
+    const layoutX = document.querySelector("#layout-x");
+    const layoutY = document.querySelector("#layout-y");
+    const layoutWidth = document.querySelector("#layout-width");
+    const layoutHeight = document.querySelector("#layout-height");
+    const layoutReset = document.querySelector("#layout-reset");
+    const layoutLock = document.querySelector("#layout-lock");
+    const profilePhotoFrame = document.querySelector("#profile-photo-frame");
+    const profilePhotoImg = document.querySelector("#profile-photo-img");
+    const profilePhotoInput = document.querySelector("#profile-photo-input");
+    const graphicGallery = document.querySelector("#graphic-gallery");
+    const graphicMainTitle = document.querySelector("#graphic-main-title");
+    const graphicMainIndex = document.querySelector("#graphic-main-index");
+    const graphicMainName = document.querySelector("#graphic-main-name");
+    const graphicThumbs = Array.from(document.querySelectorAll(".graphic-thumb"));
+    const circularGallery = document.querySelector("#graphic-thumbs");
+    const galleryPrev = document.querySelector("#gallery-prev");
+    const galleryNext = document.querySelector("#gallery-next");
+    const root = document.documentElement;
+    const themeMeta = document.querySelector('meta[name="theme-color"]');
+    const motionCanvas = document.querySelector("#motion-canvas");
+    const motionContext = motionCanvas ? motionCanvas.getContext("2d") : null;
+    const canUseMotion = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const editPassword = "644978299";
+    const legacyEditStorageKey = "wuhao-prototype-content-edits";
+    const editStorageKey = "wuhao-prototype-content-edits-circular-v2";
+    const photoStorageKey = "wuhao-profile-photo";
+    const layoutSelector = [
+      ".hero-grid > .reveal",
+      ".hero-side-stack",
+      ".hero-panel",
+      ".profile-photo-frame",
+      ".showreel",
+      ".work-card",
+      ".work-media",
+      ".graphic-cover",
+      ".graphic-gallery",
+      ".graphic-main",
+      ".graphic-thumb",
+      ".circular-gallery",
+      ".workflow",
+      ".workflow-visual",
+      ".step",
+      ".case-card",
+      ".case-image",
+      ".about-grid > .reveal",
+      ".skill",
+      ".button",
+      ".custom-text-box"
+    ].join(", ");
+    const editableSelector = [
+      "header .brand small",
+      "header .nav a",
+      "main h1 span",
+      "main h2",
+      "main h3",
+      "main p",
+      "main a",
+      "main .eyebrow",
+      "main .kicker",
+      "main .media-placeholder span",
+      "main .focus-list strong",
+      "main .focus-list span",
+      "main .tag",
+      "main .skill",
+      "main .contact-list li > span",
+      "footer .footer-mark",
+      "footer p",
+      ".custom-text-box"
+    ].join(", ");
+    let cursorFrame = 0;
+    let cursorX = window.innerWidth * 0.5;
+    let cursorY = window.innerHeight * 0.34;
+    let motionFrame = 0;
+    let motionPoints = [];
+    let editMode = false;
+    let editToastTimer = 0;
+    let selectedEditable = null;
+    let selectedLayout = null;
+    let customBoxCounter = 0;
+    let dragState = null;
+    let graphicActiveIndex = 0;
+
+    const getEditableNodes = () => Array.from(document.querySelectorAll(editableSelector))
+      .filter((el) => !el.closest(".edit-toolbar") && !el.closest("#edit-toolbar") && !el.closest("#design-panel"));
+
+    const getLayoutNodes = () => Array.from(document.querySelectorAll(layoutSelector))
+      .filter((el) => !el.closest(".edit-toolbar") && !el.closest("#edit-toolbar") && !el.closest("#design-panel"));
+
+    const readEdits = () => {
+      try {
+        return JSON.parse(localStorage.getItem(editStorageKey) || "{}");
+      } catch {
+        return {};
+      }
+    };
+
+    const writeEdits = (edits) => {
+      localStorage.setItem(editStorageKey, JSON.stringify(edits));
+    };
+
+    const getStyleFromElement = (el) => ({
+      fontSize: el.style.fontSize || "",
+      color: el.style.color || "",
+      backgroundColor: el.style.backgroundColor || "",
+      width: el.style.width || "",
+      maxWidth: el.style.maxWidth || "",
+      padding: el.style.padding || "",
+      textAlign: el.style.textAlign || "",
+      fontWeight: el.style.fontWeight || "",
+      position: el.style.position || "",
+      left: el.style.left || "",
+      top: el.style.top || "",
+      height: el.style.height || ""
+    });
+
+    const applyStyleToElement = (el, style = {}) => {
+      Object.entries(style).forEach(([key, value]) => {
+        el.style[key] = value || "";
+      });
+    };
+
+    const cssSizeToNumber = (value) => {
+      const number = parseFloat(value || "");
+      return Number.isFinite(number) ? String(number) : "";
+    };
+
+    const colorToHex = (value, fallback) => {
+      if (!value) return fallback;
+      if (value.startsWith("#")) return value;
+      const match = value.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+      if (!match) return fallback;
+      return "#" + match.slice(1, 4).map((part) => Number(part).toString(16).padStart(2, "0")).join("");
+    };
+
+    const showToast = (message) => {
+      editToast.textContent = message;
+      editToast.classList.add("is-visible");
+      clearTimeout(editToastTimer);
+      editToastTimer = window.setTimeout(() => {
+        editToast.classList.remove("is-visible");
+      }, 2400);
+    };
+
+    const updateScrollProgress = () => {
+      const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+      root.style.setProperty("--scroll-progress", Math.min(window.scrollY / maxScroll, 1).toFixed(4));
+    };
+
+    const resizeMotionCanvas = () => {
+      if (!motionCanvas || !motionContext) return;
+      const ratio = Math.min(window.devicePixelRatio || 1, 2);
+      motionCanvas.width = Math.floor(window.innerWidth * ratio);
+      motionCanvas.height = Math.floor(window.innerHeight * ratio);
+      motionCanvas.style.width = window.innerWidth + "px";
+      motionCanvas.style.height = window.innerHeight + "px";
+      motionContext.setTransform(ratio, 0, 0, ratio, 0, 0);
+      const count = Math.min(9, Math.max(6, Math.round(window.innerWidth / 220)));
+      motionPoints = Array.from({ length: count }, () => ({
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight,
+        vx: (Math.random() - 0.5) * 0.72,
+        vy: (Math.random() - 0.5) * 0.58,
+        phase: Math.random() * Math.PI * 2
+      }));
+    };
+
+    const drawMotionField = () => {
+      if (!motionCanvas || !motionContext || !canUseMotion) return;
+      motionContext.fillStyle = "rgba(14, 14, 14, 0.16)";
+      motionContext.fillRect(0, 0, window.innerWidth, window.innerHeight);
+
+      motionPoints.forEach((point) => {
+        point.x += point.vx + Math.sin(point.phase + performance.now() * 0.00035) * 0.16;
+        point.y += point.vy + Math.cos(point.phase + performance.now() * 0.0003) * 0.12;
+
+        const dx = cursorX - point.x;
+        const dy = cursorY - point.y;
+        const distance = Math.hypot(dx, dy);
+        if (distance < 300) {
+          point.x -= dx * 0.006;
+          point.y -= dy * 0.006;
+        }
+
+        if (point.x < -80 || point.x > window.innerWidth + 80) point.vx *= -1;
+        if (point.y < -80 || point.y > window.innerHeight + 80) point.vy *= -1;
+      });
+
+      if (motionPoints.length > 1) {
+        motionContext.beginPath();
+        motionContext.moveTo(motionPoints[0].x, motionPoints[0].y);
+        for (let i = 1; i < motionPoints.length; i += 1) {
+          const previous = motionPoints[i - 1];
+          const point = motionPoints[i];
+          const x = (previous.x + point.x) / 2;
+          const y = (previous.y + point.y) / 2;
+          motionContext.quadraticCurveTo(previous.x, previous.y, x, y);
+        }
+        motionContext.strokeStyle = "rgba(0, 229, 255, 0.08)";
+        motionContext.lineWidth = 1;
+        motionContext.stroke();
+      }
+
+      motionPoints.forEach((point) => {
+        const distanceToCursor = Math.hypot(point.x - cursorX, point.y - cursorY);
+        const glow = Math.max(0, 1 - distanceToCursor / 280);
+        motionContext.fillStyle = `rgba(0, 229, 255, ${0.18 + glow * 0.42})`;
+        motionContext.beginPath();
+        motionContext.arc(point.x, point.y, 1.4 + glow * 2.2, 0, Math.PI * 2);
+        motionContext.fill();
+      });
+
+      motionFrame = requestAnimationFrame(drawMotionField);
+    };
+
+    const setupKineticInteractions = () => {
+      if (!canUseMotion || !window.matchMedia("(pointer: fine)").matches) return;
+
+      document.querySelectorAll(".work-card").forEach((card) => {
+        card.addEventListener("pointermove", (event) => {
+          const rect = card.getBoundingClientRect();
+          const x = (event.clientX - rect.left) / rect.width - 0.5;
+          const y = (event.clientY - rect.top) / rect.height - 0.5;
+          card.style.setProperty("--tilt-x", (-y * 5).toFixed(2) + "deg");
+          card.style.setProperty("--tilt-y", (x * 6).toFixed(2) + "deg");
+        });
+        card.addEventListener("pointerleave", () => {
+          card.style.setProperty("--tilt-x", "0deg");
+          card.style.setProperty("--tilt-y", "0deg");
+        });
+      });
+
+      document.querySelectorAll(".button, .icon-button, .edit-button").forEach((button) => {
+        button.addEventListener("pointermove", (event) => {
+          const rect = button.getBoundingClientRect();
+          const x = (event.clientX - rect.left - rect.width / 2) * 0.16;
+          const y = (event.clientY - rect.top - rect.height / 2) * 0.16;
+          button.style.translate = `${x.toFixed(1)}px ${y.toFixed(1)}px`;
+        });
+        button.addEventListener("pointerleave", () => {
+          button.style.translate = "";
+        });
+      });
+    };
+
+    const prepareEditableNodes = () => {
+      getEditableNodes().forEach((el, index) => {
+        if (!el.dataset.editId) {
+          el.dataset.editId = "editable-" + String(index).padStart(3, "0");
+        }
+      });
+      getLayoutNodes().forEach((el, index) => {
+        if (!el.dataset.layoutId) {
+          el.dataset.layoutId = "layout-" + String(index).padStart(3, "0");
+        }
+      });
+    };
+
+    const createCustomTextBox = (box) => {
+      const el = document.createElement("div");
+      el.className = "custom-text-box";
+      el.dataset.editId = box.id;
+      el.textContent = box.text || "新文字框";
+      el.style.left = box.left || "80px";
+      el.style.top = box.top || Math.round(window.scrollY + 180) + "px";
+      applyStyleToElement(el, box.style || {});
+      document.body.appendChild(el);
+      return el;
+    };
+
+    const applySavedEdits = () => {
+      const edits = readEdits();
+      (edits.customBoxes || []).forEach((box) => {
+        if (!document.querySelector(`[data-edit-id="${box.id}"]`)) {
+          createCustomTextBox(box);
+        }
+      });
+
+      getEditableNodes().forEach((el) => {
+        const saved = edits[el.dataset.editId];
+        if (!saved) return;
+        if (typeof saved.text === "string") {
+          el.textContent = saved.text;
+        }
+        if (el.matches("a") && typeof saved.href === "string") {
+          el.setAttribute("href", saved.href);
+        }
+        if (saved.style) {
+          applyStyleToElement(el, saved.style);
+        }
+      });
+
+      getLayoutNodes().forEach((el) => {
+        const saved = edits[el.dataset.layoutId];
+        if (saved && saved.style) {
+          applyStyleToElement(el, saved.style);
+        }
+      });
+    };
+
+    const saveElementEdit = (el) => {
+      const edits = readEdits();
+      const id = el.dataset.editId;
+      edits[id] = {
+        text: el.textContent,
+        style: getStyleFromElement(el)
+      };
+
+      if (el.matches("a")) {
+        edits[id].href = el.getAttribute("href") || "";
+      }
+
+      if (el.classList.contains("custom-text-box")) {
+        const customBoxes = (edits.customBoxes || []).filter((box) => box.id !== id);
+        customBoxes.push({
+          id,
+          text: el.textContent,
+          left: el.style.left,
+          top: el.style.top,
+          style: getStyleFromElement(el)
+        });
+        edits.customBoxes = customBoxes;
+      }
+
+      writeEdits(edits);
+    };
+
+    const saveLayoutEdit = (el) => {
+      if (!el || !el.dataset.layoutId) return;
+      const edits = readEdits();
+      edits[el.dataset.layoutId] = { style: getStyleFromElement(el) };
+      writeEdits(edits);
+    };
+
+    const syncLayoutPanel = () => {
+      const el = selectedLayout;
+      [layoutX, layoutY, layoutWidth, layoutHeight, layoutReset, layoutLock].forEach((control) => {
+        if (control) control.disabled = !el;
+      });
+      if (!el) {
+        layoutX.value = "";
+        layoutY.value = "";
+        layoutWidth.value = "";
+        layoutHeight.value = "";
+        return;
+      }
+      const computed = window.getComputedStyle(el);
+      layoutX.value = cssSizeToNumber(el.style.left);
+      layoutY.value = cssSizeToNumber(el.style.top);
+      layoutWidth.value = cssSizeToNumber(el.style.width || computed.width);
+      layoutHeight.value = cssSizeToNumber(el.style.height || computed.height);
+    };
+
+    const selectLayout = (el) => {
+      if (selectedLayout) {
+        selectedLayout.classList.remove("is-layout-selected");
+      }
+      selectedLayout = el;
+      if (selectedLayout) {
+        selectedLayout.classList.add("is-layout-selected");
+        if (!selectedLayout.style.position || selectedLayout.style.position === "static") {
+          selectedLayout.style.position = selectedLayout.classList.contains("custom-text-box") ? "absolute" : "relative";
+        }
+      }
+      syncLayoutPanel();
+    };
+
+    const updateSelectedLayout = () => {
+      if (!selectedLayout) return;
+      if (!selectedLayout.style.position || selectedLayout.style.position === "static") {
+        selectedLayout.style.position = "relative";
+      }
+      selectedLayout.style.left = layoutX.value ? layoutX.value + "px" : "";
+      selectedLayout.style.top = layoutY.value ? layoutY.value + "px" : "";
+      selectedLayout.style.width = layoutWidth.value ? layoutWidth.value + "px" : "";
+      selectedLayout.style.maxWidth = layoutWidth.value ? layoutWidth.value + "px" : "";
+      selectedLayout.style.height = layoutHeight.value ? layoutHeight.value + "px" : "";
+      saveLayoutEdit(selectedLayout);
+    };
+
+    const syncPanelFromSelection = () => {
+      const el = selectedEditable;
+      const hasSelection = !!el;
+      designPanel.toggleAttribute("data-has-selection", hasSelection);
+      [designText, designLink, designFontSize, designWidth, designColor, designBg, designPadding, designAlign].forEach((control) => {
+        control.disabled = !hasSelection;
+      });
+      designBold.disabled = !hasSelection;
+      designClearStyle.disabled = !hasSelection;
+      designDelete.disabled = !hasSelection || !(el && el.classList.contains("custom-text-box"));
+
+      if (!el) {
+        designText.value = "";
+        designLink.value = "";
+        designFontSize.value = "";
+        designWidth.value = "";
+        designPadding.value = "";
+        designAlign.value = "";
+        designLinkWrap.style.display = "none";
+        return;
+      }
+
+      const computed = window.getComputedStyle(el);
+      designText.value = el.textContent.trim();
+      designLinkWrap.style.display = el.matches("a") ? "grid" : "none";
+      designLink.value = el.matches("a") ? el.getAttribute("href") || "" : "";
+      designFontSize.value = cssSizeToNumber(el.style.fontSize || computed.fontSize);
+      designWidth.value = cssSizeToNumber(el.style.width || el.style.maxWidth);
+      designColor.value = colorToHex(el.style.color || computed.color, "#f6f3ee");
+      designBg.value = colorToHex(el.style.backgroundColor || computed.backgroundColor, "#111114");
+      designPadding.value = cssSizeToNumber(el.style.padding);
+      designAlign.value = el.style.textAlign || "";
+      designBold.textContent = (el.style.fontWeight === "700" || el.style.fontWeight === "900") ? "取消加粗" : "加粗";
+    };
+
+    const selectEditable = (el) => {
+      if (selectedEditable) {
+        selectedEditable.classList.remove("is-selected");
+      }
+      selectedEditable = el;
+      if (selectedEditable) {
+        selectedEditable.classList.add("is-selected");
+      }
+      syncPanelFromSelection();
+    };
+
+    const setEditMode = (enabled) => {
+      editMode = enabled;
+      document.body.classList.toggle("edit-mode", enabled);
+      editButton.classList.toggle("is-active", enabled);
+      editButton.setAttribute("aria-pressed", String(enabled));
+      editButton.textContent = enabled ? "编辑中" : "编辑";
+      getEditableNodes().forEach((el) => {
+        el.classList.toggle("editable-target", enabled);
+      });
+      getLayoutNodes().forEach((el) => {
+        el.classList.toggle("layout-edit-target", enabled);
+      });
+      if (!enabled) {
+        selectEditable(null);
+        selectLayout(null);
+      }
+      showToast(enabled ? "已进入设计编辑模式，点击文字后在右侧面板调整。" : "已退出编辑模式。");
+    };
+
+    const updateSelectedContent = () => {
+      if (!selectedEditable) return;
+      selectedEditable.textContent = designText.value;
+      if (selectedEditable.matches("a")) {
+        selectedEditable.setAttribute("href", designLink.value);
+      }
+      saveElementEdit(selectedEditable);
+    };
+
+    const updateSelectedCss = (property, value) => {
+      if (!selectedEditable) return;
+      selectedEditable.style[property] = value;
+      if (property === "width") {
+        selectedEditable.style.maxWidth = value;
+      }
+      saveElementEdit(selectedEditable);
+    };
+
+    const exportCurrentHtml = () => {
+      const clone = document.documentElement.cloneNode(true);
+      const clonedBody = clone.querySelector("body");
+      if (clonedBody) {
+        clonedBody.classList.remove("edit-mode", "pointer-active", "js-ready");
+      }
+      clone.querySelectorAll(".editable-target, .layout-edit-target, .is-layout-selected, .is-selected, .is-active, .is-visible").forEach((el) => {
+        el.classList.remove("editable-target", "layout-edit-target", "is-layout-selected", "is-selected", "is-active", "is-visible");
+      });
+      const editToggle = clone.querySelector("#edit-toggle");
+      if (editToggle) {
+        editToggle.textContent = "编辑";
+        editToggle.setAttribute("aria-pressed", "false");
+      }
+
+      const html = "<!doctype html>\n" + clone.outerHTML;
+      const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "WUHAO-portfolio-edited.html";
+      link.click();
+      URL.revokeObjectURL(link.href);
+      showToast("已导出当前编辑后的 HTML 文件。");
+    };
+
+    const loadProfilePhoto = () => {
+      const savedPhoto = localStorage.getItem(photoStorageKey);
+      if (savedPhoto && profilePhotoImg && profilePhotoFrame) {
+        profilePhotoImg.src = savedPhoto;
+        profilePhotoFrame.classList.add("has-photo");
+      }
+    };
+
+    const renderCircularGallery = () => {
+      if (!graphicThumbs.length) return;
+      const total = graphicThumbs.length;
+      const spread = Math.min(window.innerWidth * 0.18, 210);
+      graphicThumbs.forEach((thumb, index) => {
+        let offset = index - graphicActiveIndex;
+        if (offset > total / 2) offset -= total;
+        if (offset < -total / 2) offset += total;
+        const abs = Math.abs(offset);
+        const x = offset * spread;
+        const y = Math.pow(abs, 1.35) * 18;
+        const rotate = offset * -5;
+        const scale = Math.max(0.74, 1 - abs * 0.1);
+        thumb.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px)) rotate(${rotate}deg) scale(${scale})`;
+        thumb.style.opacity = String(Math.max(0.2, 1 - abs * 0.24));
+        thumb.style.zIndex = String(100 - Math.round(abs * 10));
+        thumb.classList.toggle("is-active", index === graphicActiveIndex);
+      });
+    };
+
+    const setGraphicActive = (index) => {
+      if (!graphicThumbs.length) return;
+      graphicActiveIndex = (index + graphicThumbs.length) % graphicThumbs.length;
+      const active = graphicThumbs[graphicActiveIndex];
+      if (graphicMainTitle) graphicMainTitle.textContent = active.dataset.title || active.textContent.trim();
+      if (graphicMainIndex) graphicMainIndex.textContent = "GRAPHIC / " + String(graphicActiveIndex + 1).padStart(2, "0");
+      if (graphicMainName) graphicMainName.textContent = active.dataset.name || active.textContent.trim();
+      renderCircularGallery();
+    };
+
+    const setupGraphicGallery = () => {
+      let dragStartX = 0;
+      let dragStartIndex = 0;
+      let dragStartThumb = null;
+      let isDraggingGallery = false;
+
+      graphicThumbs.forEach((thumb, index) => {
+        thumb.addEventListener("click", () => setGraphicActive(index));
+      });
+
+      if (galleryPrev) {
+        galleryPrev.addEventListener("pointerdown", (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+        });
+        galleryPrev.addEventListener("click", (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          setGraphicActive(graphicActiveIndex - 1);
+        });
+      }
+
+      if (galleryNext) {
+        galleryNext.addEventListener("pointerdown", (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+        });
+        galleryNext.addEventListener("click", (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          setGraphicActive(graphicActiveIndex + 1);
+        });
+      }
+
+      if (circularGallery) {
+        circularGallery.insertAdjacentHTML("afterend", '<div class="circular-gallery-help">scroll or drag to browse</div>');
+        circularGallery.addEventListener("wheel", (event) => {
+          event.preventDefault();
+          setGraphicActive(graphicActiveIndex + (event.deltaY > 0 || event.deltaX > 0 ? 1 : -1));
+        }, { passive: false });
+
+        circularGallery.addEventListener("pointerdown", (event) => {
+          if (event.target.closest(".gallery-nav")) return;
+          isDraggingGallery = true;
+          dragStartX = event.clientX;
+          dragStartIndex = graphicActiveIndex;
+          dragStartThumb = event.target.closest(".graphic-thumb");
+          circularGallery.setPointerCapture(event.pointerId);
+        });
+
+        circularGallery.addEventListener("pointermove", (event) => {
+          if (!isDraggingGallery) return;
+          const delta = event.clientX - dragStartX;
+          const step = Math.round(delta / 120);
+          setGraphicActive(dragStartIndex - step);
+        });
+
+        circularGallery.addEventListener("pointerup", (event) => {
+          if (event.target.closest(".gallery-nav")) return;
+          if (!isDraggingGallery) return;
+          const delta = event.clientX - dragStartX;
+          if (Math.abs(delta) < 8 && dragStartThumb) {
+            const thumbIndex = graphicThumbs.indexOf(dragStartThumb);
+            if (thumbIndex >= 0) setGraphicActive(thumbIndex);
+          }
+          isDraggingGallery = false;
+          dragStartThumb = null;
+        });
+
+        circularGallery.addEventListener("pointercancel", () => {
+          isDraggingGallery = false;
+          dragStartThumb = null;
+        });
+      }
+
+      if (graphicGallery && graphicGallery !== circularGallery) {
+        graphicGallery.addEventListener("wheel", (event) => {
+          if (event.target.closest(".circular-gallery")) return;
+          if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
+          event.preventDefault();
+          setGraphicActive(graphicActiveIndex + (event.deltaY > 0 ? 1 : -1));
+        }, { passive: false });
+      }
+
+      window.addEventListener("resize", renderCircularGallery, { passive: true });
+      setGraphicActive(0);
+    };
+
+    prepareEditableNodes();
+    applySavedEdits();
+    loadProfilePhoto();
+    setupGraphicGallery();
+    syncPanelFromSelection();
+    syncLayoutPanel();
+    updateScrollProgress();
+    setupKineticInteractions();
+
+    if (canUseMotion && motionCanvas && motionContext) {
+      resizeMotionCanvas();
+      drawMotionField();
+    }
+
+    window.addEventListener("scroll", updateScrollProgress, { passive: true });
+    window.addEventListener("resize", () => {
+      updateScrollProgress();
+      resizeMotionCanvas();
+    }, { passive: true });
+
+    menuButton.addEventListener("click", () => {
+      const isOpen = nav.classList.toggle("is-open");
+      menuButton.setAttribute("aria-expanded", String(isOpen));
+      menuButton.textContent = isOpen ? "×" : "☰";
+    });
+
+    nav.querySelectorAll("a").forEach((link) => {
+      link.addEventListener("click", () => {
+        nav.classList.remove("is-open");
+        menuButton.setAttribute("aria-expanded", "false");
+        menuButton.textContent = "☰";
+      });
+    });
+
+    themeButton.addEventListener("click", () => {
+      const nextTheme = root.dataset.theme === "dark" ? "light" : "dark";
+      root.dataset.theme = nextTheme;
+      themeButton.textContent = nextTheme === "dark" ? "☼" : "☾";
+      if (themeMeta) {
+        themeMeta.setAttribute("content", nextTheme === "dark" ? "#09090b" : "#f4f0e8");
+      }
+      localStorage.setItem("wuhao-prototype-theme", nextTheme);
+    });
+
+    const savedTheme = localStorage.getItem("wuhao-prototype-theme");
+    if (savedTheme) {
+      root.dataset.theme = savedTheme;
+      themeButton.textContent = savedTheme === "dark" ? "☼" : "☾";
+      if (themeMeta) {
+        themeMeta.setAttribute("content", savedTheme === "dark" ? "#09090b" : "#f4f0e8");
+      }
+    }
+
+    editButton.addEventListener("click", () => {
+      if (editMode) {
+        setEditMode(false);
+        return;
+      }
+
+      const password = window.prompt("请输入编辑密码：");
+      if (password === editPassword) {
+        setEditMode(true);
+      } else if (password !== null) {
+        showToast("密码不正确，无法进入编辑模式。");
+      }
+    });
+
+    exitEditButton.addEventListener("click", () => {
+      setEditMode(false);
+    });
+
+    addTextBoxButton.addEventListener("click", () => {
+      const edits = readEdits();
+      customBoxCounter += 1;
+      const id = "custom-box-" + Date.now() + "-" + customBoxCounter;
+      const box = {
+        id,
+        text: "新文字框",
+        left: "80px",
+        top: Math.round(window.scrollY + 180) + "px",
+        style: {
+          fontSize: "18px",
+          color: "",
+          backgroundColor: "",
+          width: "280px",
+          maxWidth: "280px",
+          padding: "12px",
+          textAlign: "left",
+          fontWeight: ""
+        }
+      };
+      edits.customBoxes = [...(edits.customBoxes || []), box];
+      writeEdits(edits);
+      const el = createCustomTextBox(box);
+      prepareEditableNodes();
+      el.classList.toggle("editable-target", editMode);
+      el.classList.toggle("layout-edit-target", editMode);
+      selectEditable(el);
+      selectLayout(el);
+      showToast("已添加文字框，可直接拖动位置。");
+    });
+
+    resetEditsButton.addEventListener("click", () => {
+      if (!window.confirm("确定清除当前浏览器保存的所有文字修改吗？")) return;
+      localStorage.removeItem(editStorageKey);
+      localStorage.removeItem(legacyEditStorageKey);
+      localStorage.removeItem(photoStorageKey);
+      window.location.reload();
+    });
+
+    exportHtmlButton.addEventListener("click", exportCurrentHtml);
+
+    designText.addEventListener("input", updateSelectedContent);
+    designLink.addEventListener("input", updateSelectedContent);
+    designFontSize.addEventListener("input", () => updateSelectedCss("fontSize", designFontSize.value ? designFontSize.value + "px" : ""));
+    designWidth.addEventListener("input", () => updateSelectedCss("width", designWidth.value ? designWidth.value + "px" : ""));
+    designColor.addEventListener("input", () => updateSelectedCss("color", designColor.value || ""));
+    designBg.addEventListener("input", () => updateSelectedCss("backgroundColor", designBg.value || ""));
+    designPadding.addEventListener("input", () => updateSelectedCss("padding", designPadding.value ? designPadding.value + "px" : ""));
+    designAlign.addEventListener("change", () => updateSelectedCss("textAlign", designAlign.value || ""));
+
+    designBold.addEventListener("click", () => {
+      if (!selectedEditable) return;
+      const isBold = selectedEditable.style.fontWeight === "700" || selectedEditable.style.fontWeight === "900";
+      selectedEditable.style.fontWeight = isBold ? "" : "700";
+      saveElementEdit(selectedEditable);
+      syncPanelFromSelection();
+    });
+
+    designClearStyle.addEventListener("click", () => {
+      if (!selectedEditable) return;
+      applyStyleToElement(selectedEditable, {
+        fontSize: "",
+        color: "",
+        backgroundColor: "",
+        width: "",
+        maxWidth: "",
+        padding: "",
+        textAlign: "",
+        fontWeight: ""
+      });
+      saveElementEdit(selectedEditable);
+      syncPanelFromSelection();
+      showToast("已清除所选文字的自定义样式。");
+    });
+
+    designDelete.addEventListener("click", () => {
+      if (!selectedEditable || !selectedEditable.classList.contains("custom-text-box")) return;
+      const id = selectedEditable.dataset.editId;
+      const edits = readEdits();
+      delete edits[id];
+      edits.customBoxes = (edits.customBoxes || []).filter((box) => box.id !== id);
+      writeEdits(edits);
+      selectedEditable.remove();
+      selectEditable(null);
+      showToast("已删除文字框。");
+    });
+
+    designClose.addEventListener("click", () => {
+      selectEditable(null);
+      selectLayout(null);
+      showToast("已取消选择，点击页面文字或方框可继续编辑。");
+    });
+
+    [layoutX, layoutY, layoutWidth, layoutHeight].forEach((control) => {
+      if (control) control.addEventListener("input", updateSelectedLayout);
+    });
+
+    layoutReset.addEventListener("click", () => {
+      if (!selectedLayout) return;
+      applyStyleToElement(selectedLayout, {
+        position: "",
+        left: "",
+        top: "",
+        width: "",
+        maxWidth: "",
+        height: ""
+      });
+      saveLayoutEdit(selectedLayout);
+      syncLayoutPanel();
+    });
+
+    layoutLock.addEventListener("click", () => {
+      selectLayout(null);
+    });
+
+    if (profilePhotoInput) {
+      profilePhotoInput.addEventListener("change", () => {
+        const file = profilePhotoInput.files && profilePhotoInput.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.addEventListener("load", () => {
+          const dataUrl = String(reader.result || "");
+          localStorage.setItem(photoStorageKey, dataUrl);
+          profilePhotoImg.src = dataUrl;
+          profilePhotoFrame.classList.add("has-photo");
+          showToast("个人照片已嵌入当前浏览器，导出 HTML 会带上照片。");
+        });
+        reader.readAsDataURL(file);
+      });
+    }
+
+    document.addEventListener("click", (event) => {
+      if (!editMode) return;
+      const textTarget = event.target.closest("[data-edit-id]");
+      const layoutTarget = event.target.closest("[data-layout-id]");
+      if (!textTarget && !layoutTarget) return;
+      event.preventDefault();
+      event.stopPropagation();
+      if (textTarget) selectEditable(textTarget);
+      if (layoutTarget) selectLayout(layoutTarget);
+    }, true);
+
+    document.addEventListener("mousedown", (event) => {
+      if (!editMode) return;
+      const target = event.target.closest("[data-layout-id]");
+      if (!target || target.closest("#design-panel") || target.closest("#edit-toolbar")) return;
+      const rect = target.getBoundingClientRect();
+      const isAbsolute = window.getComputedStyle(target).position === "absolute";
+      dragState = {
+        el: target,
+        isAbsolute,
+        startClientX: event.clientX,
+        startClientY: event.clientY,
+        startLeft: parseFloat(target.style.left || "0") || 0,
+        startTop: parseFloat(target.style.top || "0") || 0,
+        offsetX: event.clientX - rect.left,
+        offsetY: event.clientY - rect.top
+      };
+      selectLayout(target);
+      event.preventDefault();
+    });
+
+    window.addEventListener("mousemove", (event) => {
+      if (!dragState) return;
+      if (dragState.isAbsolute) {
+        dragState.el.style.left = Math.max(0, event.clientX - dragState.offsetX) + "px";
+        dragState.el.style.top = Math.max(0, event.clientY + window.scrollY - dragState.offsetY) + "px";
+      } else {
+        dragState.el.style.left = dragState.startLeft + event.clientX - dragState.startClientX + "px";
+        dragState.el.style.top = dragState.startTop + event.clientY - dragState.startClientY + "px";
+      }
+    });
+
+    window.addEventListener("mouseup", () => {
+      if (!dragState) return;
+      if (dragState.el.classList.contains("custom-text-box")) {
+        saveElementEdit(dragState.el);
+      }
+      saveLayoutEdit(dragState.el);
+      syncLayoutPanel();
+      dragState = null;
+    });
+
+    if (canUseMotion && window.matchMedia("(pointer: fine)").matches) {
+      window.addEventListener("pointermove", (event) => {
+        cursorX += (event.clientX - cursorX) * 0.32;
+        cursorY += (event.clientY - cursorY) * 0.32;
+        document.body.classList.add("pointer-active");
+
+        if (!cursorFrame) {
+          cursorFrame = requestAnimationFrame(() => {
+            root.style.setProperty("--cursor-x", cursorX + "px");
+            root.style.setProperty("--cursor-y", cursorY + "px");
+            cursorFrame = 0;
+          });
+        }
+      }, { passive: true });
+
+      window.addEventListener("pointerleave", () => {
+        document.body.classList.remove("pointer-active");
+      });
+    }
+
+    const revealItems = Array.from(document.querySelectorAll(".reveal"));
+    if ("IntersectionObserver" in window) {
+      document.body.classList.add("js-ready");
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.14 });
+
+      revealItems.forEach((el, index) => {
+        el.style.transitionDelay = Math.min(index * 45, 260) + "ms";
+        observer.observe(el);
+      });
+    } else {
+      revealItems.forEach((el) => {
+        el.classList.add("is-visible");
+      });
+    }
+  </script>
+
+
+</body></html>
