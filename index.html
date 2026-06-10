@@ -952,6 +952,60 @@
       transition: transform 800ms cubic-bezier(0.16, 1, 0.3, 1), opacity 220ms ease;
     }
 
+    .video-play-link {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      display: grid;
+      place-items: center;
+      color: var(--accent);
+      text-decoration: none;
+      background: transparent;
+      opacity: 0.92;
+      transition: opacity 220ms ease, background 220ms ease;
+    }
+
+    .work-card:hover .video-play-link,
+    .video-play-link:focus-visible {
+      opacity: 1;
+      background: radial-gradient(circle at 50% 50%, rgba(0, 229, 255, 0.16), transparent 45%);
+    }
+
+    .video-play-core {
+      width: 74px;
+      height: 74px;
+      border: 1px solid rgba(0, 229, 255, 0.65);
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: rgba(14, 14, 14, 0.72);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.34), 0 0 42px rgba(0, 229, 255, 0.24);
+      transform: scale(0.92);
+      transition: transform 220ms ease, background 220ms ease, color 220ms ease;
+    }
+
+    .video-play-link:hover .video-play-core,
+    .video-play-link:focus-visible .video-play-core {
+      color: #00363d;
+      background: var(--accent);
+      transform: scale(1);
+    }
+
+    .video-play-core::before {
+      content: "";
+      width: 0;
+      height: 0;
+      margin-left: 5px;
+      border-top: 14px solid transparent;
+      border-bottom: 14px solid transparent;
+      border-left: 22px solid currentColor;
+    }
+
+    body.edit-mode .video-play-link {
+      pointer-events: none;
+      opacity: 0.2;
+    }
+
     .work-video {
       display: block;
       width: 100%;
@@ -2688,7 +2742,40 @@
       text-transform: uppercase;
     }
 
+    .slide-hint {
+      position: absolute;
+      left: clamp(12px, 2vw, 22px);
+      top: clamp(10px, 1.8vw, 18px);
+      z-index: 12;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 11px;
+      border: 1px solid rgba(0, 229, 255, 0.34);
+      border-radius: 999px;
+      color: var(--accent);
+      background: rgba(14, 14, 14, 0.58);
+      box-shadow: 0 14px 44px rgba(0, 0, 0, 0.26), 0 0 24px rgba(0, 229, 255, 0.08);
+      backdrop-filter: blur(12px);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      line-height: 1;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .slide-hint::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: currentColor;
+      box-shadow: 0 0 16px currentColor;
+    }
+
     .graphic-gallery.circular-only {
+      position: relative;
       margin-top: clamp(18px, 3.5vw, 40px);
     }
 
@@ -3473,13 +3560,13 @@
           </div>
         </div>
         <div class="works-grid" aria-label="视频作品集">
-          <article class="work-card reveal" style="transition-delay: 180ms; --tilt-x: 0deg; --tilt-y: 0deg;">
+          <article class="work-card reveal" data-video-url="https://wuhao-u1p3sf15.cdn.7caiyun.com/%E3%80%8A%E5%88%AB%E6%83%B9%E6%88%91%EF%BC%8C%E6%88%91%E9%98%B2%E5%BE%A1%E5%80%BC%E6%8B%89%E6%BB%A1%E3%80%8B.mp4" style="transition-delay: 180ms; --tilt-x: 0deg; --tilt-y: 0deg;">
             <div class="work-media">
               <img src="assets/portfolio/video-covers/video-01.webp" alt="别惹我我防御拉满 视频封面" loading="lazy">
             </div>
             <div class="work-meta">
               <h3 data-edit-id="editable-video-01-title">别惹我我防御拉满</h3>
-              <p data-edit-id="editable-video-01-desc">视频作品封面展示，后续可绑定对应视频链接。</p>
+              <p data-edit-id="editable-video-01-desc">视频作品封面展示，点击播放按钮可跳转到对应视频链接。</p>
               <div class="tag-row">
                 <span class="tag" data-edit-id="editable-video-01-tag-1">AIGC Video</span>
                 <span class="tag" data-edit-id="editable-video-01-tag-2">Video Editing</span>
@@ -3487,13 +3574,13 @@
             </div>
           </article>
 
-          <article class="work-card reveal" style="transition-delay: 215ms; --tilt-x: 0deg; --tilt-y: 0deg;">
+          <article class="work-card reveal" data-video-url="https://wuhao-u1p3sf15.cdn.7caiyun.com/%E3%80%8A%E5%88%AB%E6%83%B9%E6%88%91%EF%BC%8C%E6%88%91%E9%98%B2%E5%BE%A1%E5%80%BC%E6%8B%89%E6%BB%A12D%E7%89%88%E3%80%8B.mp4" style="transition-delay: 215ms; --tilt-x: 0deg; --tilt-y: 0deg;">
             <div class="work-media">
               <img src="assets/portfolio/video-covers/video-02.webp" alt="别惹我我防御拉满2D 视频封面" loading="lazy">
             </div>
             <div class="work-meta">
               <h3 data-edit-id="editable-video-02-title">别惹我我防御拉满2D</h3>
-              <p data-edit-id="editable-video-02-desc">视频作品封面展示，后续可绑定对应视频链接。</p>
+              <p data-edit-id="editable-video-02-desc">视频作品封面展示，点击播放按钮可跳转到对应视频链接。</p>
               <div class="tag-row">
                 <span class="tag" data-edit-id="editable-video-02-tag-1">AIGC Video</span>
                 <span class="tag" data-edit-id="editable-video-02-tag-2">Video Editing</span>
@@ -3501,13 +3588,13 @@
             </div>
           </article>
 
-          <article class="work-card reveal" style="transition-delay: 250ms; --tilt-x: 0deg; --tilt-y: 0deg;">
+          <article class="work-card reveal" data-video-url="https://wuhao-u1p3sf15.cdn.7caiyun.com/%E6%8F%90%E7%BA%BF.mp4" style="transition-delay: 250ms; --tilt-x: 0deg; --tilt-y: 0deg;">
             <div class="work-media">
               <img src="assets/portfolio/video-covers/video-03.webp" alt="提线 视频封面" loading="lazy">
             </div>
             <div class="work-meta">
               <h3 data-edit-id="editable-video-03-title">提线</h3>
-              <p data-edit-id="editable-video-03-desc">视频作品封面展示，后续可绑定对应视频链接。</p>
+              <p data-edit-id="editable-video-03-desc">视频作品封面展示，点击播放按钮可跳转到对应视频链接。</p>
               <div class="tag-row">
                 <span class="tag" data-edit-id="editable-video-03-tag-1">AIGC Video</span>
                 <span class="tag" data-edit-id="editable-video-03-tag-2">Cover Design</span>
@@ -3515,13 +3602,13 @@
             </div>
           </article>
 
-          <article class="work-card reveal" style="transition-delay: 285ms; --tilt-x: 0deg; --tilt-y: 0deg;">
+          <article class="work-card reveal" data-video-url="https://wuhao-u1p3sf15.cdn.7caiyun.com/%E5%BD%B1%E7%9C%BC.mp4" style="transition-delay: 285ms; --tilt-x: 0deg; --tilt-y: 0deg;">
             <div class="work-media">
               <img src="assets/portfolio/video-covers/video-04.webp" alt="影眼 视频封面" loading="lazy">
             </div>
             <div class="work-meta">
               <h3 data-edit-id="editable-video-04-title">影眼</h3>
-              <p data-edit-id="editable-video-04-desc">视频作品封面展示，后续可绑定对应视频链接。</p>
+              <p data-edit-id="editable-video-04-desc">视频作品封面展示，点击播放按钮可跳转到对应视频链接。</p>
               <div class="tag-row">
                 <span class="tag" data-edit-id="editable-video-04-tag-1">AIGC Video</span>
                 <span class="tag" data-edit-id="editable-video-04-tag-2">Cover Design</span>
@@ -3529,13 +3616,13 @@
             </div>
           </article>
 
-          <article class="work-card reveal" style="transition-delay: 320ms; --tilt-x: 0deg; --tilt-y: 0deg;">
+          <article class="work-card reveal" data-video-url="https://wuhao-u1p3sf15.cdn.7caiyun.com/%E6%98%9F%E6%A0%B8%E7%BA%AA%E5%85%83.mp4" style="transition-delay: 320ms; --tilt-x: 0deg; --tilt-y: 0deg;">
             <div class="work-media">
               <img src="assets/portfolio/video-covers/video-05.webp" alt="星核纪元 视频封面" loading="lazy">
             </div>
             <div class="work-meta">
               <h3 data-edit-id="editable-video-05-title">星核纪元</h3>
-              <p data-edit-id="editable-video-05-desc">视频作品封面展示，后续可绑定对应视频链接。</p>
+              <p data-edit-id="editable-video-05-desc">视频作品封面展示，点击播放按钮可跳转到对应视频链接。</p>
               <div class="tag-row">
                 <span class="tag" data-edit-id="editable-video-05-tag-1">AIGC Video</span>
                 <span class="tag" data-edit-id="editable-video-05-tag-2">Cover Design</span>
@@ -3543,13 +3630,13 @@
             </div>
           </article>
 
-          <article class="work-card reveal" style="transition-delay: 355ms; --tilt-x: 0deg; --tilt-y: 0deg;">
+          <article class="work-card reveal" data-video-url="https://wuhao-u1p3sf15.cdn.7caiyun.com/%E5%A4%96%E5%9B%BD%E7%9F%AD%E5%89%A7.mp4" style="transition-delay: 355ms; --tilt-x: 0deg; --tilt-y: 0deg;">
             <div class="work-media">
               <img src="assets/portfolio/video-covers/video-06.webp" alt="外国短剧 视频封面" loading="lazy">
             </div>
             <div class="work-meta">
               <h3 data-edit-id="editable-video-06-title">外国短剧</h3>
-              <p data-edit-id="editable-video-06-desc">视频作品封面展示，后续可绑定对应视频链接。</p>
+              <p data-edit-id="editable-video-06-desc">视频作品封面展示，点击播放按钮可跳转到对应视频链接。</p>
               <div class="tag-row">
                 <span class="tag" data-edit-id="editable-video-06-tag-1">AIGC Video</span>
                 <span class="tag" data-edit-id="editable-video-06-tag-2">Short Video</span>
@@ -3557,13 +3644,13 @@
             </div>
           </article>
 
-          <article class="work-card reveal" style="transition-delay: 390ms; --tilt-x: 0deg; --tilt-y: 0deg;">
+          <article class="work-card reveal" data-video-url="https://wuhao-u1p3sf15.cdn.7caiyun.com/%E5%87%A4%E5%BD%92%E5%B7%A2%E7%AC%AC%E4%B8%80%E9%9B%86.mp4" style="transition-delay: 390ms; --tilt-x: 0deg; --tilt-y: 0deg;">
             <div class="work-media">
               <img src="assets/portfolio/video-covers/video-07.webp" alt="凤归巢 视频封面" loading="lazy">
             </div>
             <div class="work-meta">
               <h3 data-edit-id="editable-video-07-title">凤归巢</h3>
-              <p data-edit-id="editable-video-07-desc">视频作品封面展示，后续可绑定对应视频链接。</p>
+              <p data-edit-id="editable-video-07-desc">视频作品封面展示，点击播放按钮可跳转到对应视频链接。</p>
               <div class="tag-row">
                 <span class="tag" data-edit-id="editable-video-07-tag-1">AIGC Video</span>
                 <span class="tag" data-edit-id="editable-video-07-tag-2">Cover Design</span>
@@ -3571,13 +3658,13 @@
             </div>
           </article>
 
-          <article class="work-card reveal" style="transition-delay: 425ms; --tilt-x: 0deg; --tilt-y: 0deg;">
+          <article class="work-card reveal" data-video-url="https://wuhao-u1p3sf15.cdn.7caiyun.com/%E8%AE%A9%E6%88%91%E5%BD%93%E5%82%80%E5%84%A1%E7%9A%87%E5%B8%9D%EF%BC%8C%E6%88%91%E7%9B%B4%E5%8D%87%E9%99%86%E5%9C%B0%E7%A5%9E%E4%BB%99.mp4" style="transition-delay: 425ms; --tilt-x: 0deg; --tilt-y: 0deg;">
             <div class="work-media">
               <img src="assets/portfolio/video-covers/video-08.webp" alt="《让我当傀儡皇帝，我直升陆地神仙》 视频封面" loading="lazy">
             </div>
             <div class="work-meta">
               <h3 data-edit-id="editable-video-08-title">《让我当傀儡皇帝，我直升陆地神仙》</h3>
-              <p data-edit-id="editable-video-08-desc">视频作品封面展示，后续可绑定对应视频链接。</p>
+              <p data-edit-id="editable-video-08-desc">视频作品封面展示，点击播放按钮可跳转到对应视频链接。</p>
               <div class="tag-row">
                 <span class="tag" data-edit-id="editable-video-08-tag-1">AIGC Video</span>
                 <span class="tag" data-edit-id="editable-video-08-tag-2">Cover Design</span>
@@ -3585,16 +3672,72 @@
             </div>
           </article>
 
-          <article class="work-card reveal" style="transition-delay: 460ms; --tilt-x: 0deg; --tilt-y: 0deg;">
+          <article class="work-card reveal" data-video-url="https://wuhao-u1p3sf15.cdn.7caiyun.com/%E4%B8%80%E6%9C%9F%E7%94%9F.mp4" style="transition-delay: 460ms; --tilt-x: 0deg; --tilt-y: 0deg;">
             <div class="work-media">
               <img src="assets/portfolio/video-covers/video-09.webp" alt="一期生 视频封面" loading="lazy">
             </div>
             <div class="work-meta">
               <h3 data-edit-id="editable-video-09-title">一期生</h3>
-              <p data-edit-id="editable-video-09-desc">视频作品封面展示，后续可绑定对应视频链接。</p>
+              <p data-edit-id="editable-video-09-desc">视频作品封面展示，点击播放按钮可跳转到对应视频链接。</p>
               <div class="tag-row">
                 <span class="tag" data-edit-id="editable-video-09-tag-1">AIGC Video</span>
                 <span class="tag" data-edit-id="editable-video-09-tag-2">Cover Design</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="work-card reveal" data-video-url="https://wuhao-u1p3sf15.cdn.7caiyun.com/%E3%80%8A%E5%90%91%E5%89%8D%E5%90%91%E6%B5%B7%E3%80%8B%E5%AE%A3%E4%BC%A0%E8%A7%86%E9%A2%91.mp4" style="transition-delay: 495ms; --tilt-x: 0deg; --tilt-y: 0deg;">
+            <div class="work-media">
+              <img src="assets/portfolio/video-covers/video-10.webp" alt="向前向海 视频封面" loading="lazy">
+            </div>
+            <div class="work-meta">
+              <h3 data-edit-id="editable-video-10-title">向前向海</h3>
+              <p data-edit-id="editable-video-10-desc">视频作品封面展示，点击播放按钮可跳转到对应视频链接。</p>
+              <div class="tag-row">
+                <span class="tag" data-edit-id="editable-video-10-tag-1">AIGC Video</span>
+                <span class="tag" data-edit-id="editable-video-10-tag-2">Cover Design</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="work-card reveal" data-video-url="https://wuhao-u1p3sf15.cdn.7caiyun.com/%E5%A5%BD%E6%9C%8B%E5%8F%8B%E7%B3%BB%E5%88%97.mp4" style="transition-delay: 530ms; --tilt-x: 0deg; --tilt-y: 0deg;">
+            <div class="work-media">
+              <img src="assets/portfolio/video-covers/video-11.webp" alt="《好朋友》 视频封面" loading="lazy">
+            </div>
+            <div class="work-meta">
+              <h3 data-edit-id="editable-video-11-title">《好朋友》</h3>
+              <p data-edit-id="editable-video-11-desc">视频作品封面展示，点击播放按钮可跳转到对应视频链接。</p>
+              <div class="tag-row">
+                <span class="tag" data-edit-id="editable-video-11-tag-1">AIGC Video</span>
+                <span class="tag" data-edit-id="editable-video-11-tag-2">Cover Design</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="work-card reveal" data-video-url="https://wuhao-u1p3sf15.cdn.7caiyun.com/%E6%96%B0%E5%B9%B4%E8%B4%BA%E5%B2%81.mp4" style="transition-delay: 565ms; --tilt-x: 0deg; --tilt-y: 0deg;">
+            <div class="work-media">
+              <img src="assets/portfolio/video-covers/video-12.webp" alt="《新年贺岁》 视频封面" loading="lazy">
+            </div>
+            <div class="work-meta">
+              <h3 data-edit-id="editable-video-12-title">《新年贺岁》</h3>
+              <p data-edit-id="editable-video-12-desc">视频作品封面展示，点击播放按钮可跳转到对应视频链接。</p>
+              <div class="tag-row">
+                <span class="tag" data-edit-id="editable-video-12-tag-1">AIGC Video</span>
+                <span class="tag" data-edit-id="editable-video-12-tag-2">Cover Design</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="work-card reveal" data-video-url="https://wuhao-u1p3sf15.cdn.7caiyun.com/%E6%96%B0%E5%B9%B4%E5%8F%91%E7%BA%A2%E5%8C%85.mp4" style="transition-delay: 600ms; --tilt-x: 0deg; --tilt-y: 0deg;">
+            <div class="work-media">
+              <img src="assets/portfolio/video-covers/video-13.webp" alt="《新年发红包》 视频封面" loading="lazy">
+            </div>
+            <div class="work-meta">
+              <h3 data-edit-id="editable-video-13-title">《新年发红包》</h3>
+              <p data-edit-id="editable-video-13-desc">视频作品封面展示，点击播放按钮可跳转到对应视频链接。</p>
+              <div class="tag-row">
+                <span class="tag" data-edit-id="editable-video-13-tag-1">AIGC Video</span>
+                <span class="tag" data-edit-id="editable-video-13-tag-2">Cover Design</span>
               </div>
             </div>
           </article>
@@ -4684,6 +4827,36 @@
 
     const setupVideoWorksSlider = () => {
       if (!videoWorksGrid) return;
+      const missingVideoUrlMessage = "\u8bf7\u5148\u8bbe\u7f6e\u8fd9\u4e2a\u89c6\u9891\u4f5c\u54c1\u7684\u94fe\u63a5";
+      videoWorksGrid.querySelectorAll(".work-card").forEach((card, index) => {
+        if (!card.dataset.videoUrl) card.dataset.videoUrl = "";
+        const media = card.querySelector(".work-media");
+        if (!media || media.querySelector(".video-play-link")) return;
+        const title = card.querySelector(".work-meta h3")?.textContent?.trim() || `Video ${index + 1}`;
+        const playLink = document.createElement("a");
+        playLink.className = "video-play-link";
+        playLink.href = card.dataset.videoUrl || "#";
+        playLink.target = "_blank";
+        playLink.rel = "noopener noreferrer";
+        playLink.setAttribute("aria-label", `${title} play video`);
+        playLink.innerHTML = '<span class="video-play-core" aria-hidden="true"></span>';
+        playLink.addEventListener("click", (event) => {
+          event.stopPropagation();
+          if (document.body.classList.contains("edit-mode")) {
+            event.preventDefault();
+            return;
+          }
+          const videoUrl = card.dataset.videoUrl?.trim();
+          if (!videoUrl) {
+            event.preventDefault();
+            alert(missingVideoUrlMessage);
+            return;
+          }
+          playLink.href = videoUrl;
+        });
+        media.appendChild(playLink);
+      });
+
       const getStep = () => {
         const firstCard = videoWorksGrid.querySelector(".work-card");
         if (!firstCard) return Math.min(window.innerWidth * 0.82, 420);
@@ -4713,6 +4886,7 @@
       }, { passive: false });
 
       videoWorksGrid.addEventListener("pointerdown", (event) => {
+        if (event.target.closest(".video-play-link")) return;
         if (event.button && event.button !== 0) return;
         isDown = true;
         startX = event.clientX;
@@ -4740,6 +4914,20 @@
       if (videoNext) {
         videoNext.addEventListener("click", () => slideByCard(1));
       }
+    };
+
+    const setupSlideHints = () => {
+      const hintText = "\u5de6\u53f3\u6ed1\u52a8\u67e5\u770b";
+      const videoHint = document.querySelector(".video-slider-bar p");
+      if (videoHint) videoHint.textContent = hintText;
+
+      document.querySelectorAll(".graphic-gallery.circular-only").forEach((gallery) => {
+        if (gallery.querySelector(":scope > .slide-hint")) return;
+        const hint = document.createElement("div");
+        hint.className = "slide-hint";
+        hint.textContent = hintText;
+        gallery.prepend(hint);
+      });
     };
 
     const setupPortfolioImageLoading = () => {
@@ -4771,6 +4959,7 @@
     applySavedEdits();
     loadProfilePhoto();
     setupPortfolioImageLoading();
+    setupSlideHints();
     setupGraphicGallery();
     setupVideoWorksSlider();
     syncPanelFromSelection();
