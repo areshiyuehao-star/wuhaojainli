@@ -4828,6 +4828,17 @@
     const setupVideoWorksSlider = () => {
       if (!videoWorksGrid) return;
       const missingVideoUrlMessage = "\u8bf7\u5148\u8bbe\u7f6e\u8fd9\u4e2a\u89c6\u9891\u4f5c\u54c1\u7684\u94fe\u63a5";
+      const getPlayerUrl = (card, title) => {
+        const videoUrl = card.dataset.videoUrl?.trim();
+        if (!videoUrl) return "#";
+        const poster = card.querySelector(".work-media img")?.getAttribute("src") || "";
+        const params = new URLSearchParams({
+          src: videoUrl,
+          title,
+          poster
+        });
+        return `video-player.html?${params.toString()}`;
+      };
       videoWorksGrid.querySelectorAll(".work-card").forEach((card, index) => {
         if (!card.dataset.videoUrl) card.dataset.videoUrl = "";
         const media = card.querySelector(".work-media");
@@ -4835,7 +4846,7 @@
         const title = card.querySelector(".work-meta h3")?.textContent?.trim() || `Video ${index + 1}`;
         const playLink = document.createElement("a");
         playLink.className = "video-play-link";
-        playLink.href = card.dataset.videoUrl || "#";
+        playLink.href = getPlayerUrl(card, title);
         playLink.target = "_blank";
         playLink.rel = "noopener noreferrer";
         playLink.setAttribute("aria-label", `${title} play video`);
@@ -4852,7 +4863,7 @@
             alert(missingVideoUrlMessage);
             return;
           }
-          playLink.href = videoUrl;
+          playLink.href = getPlayerUrl(card, title);
         });
         media.appendChild(playLink);
       });

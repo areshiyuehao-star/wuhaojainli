@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="dark">
+  <title>WUHAO Video Player</title>
+  <style>
+    :root {
+      --bg: #080d0d;
+      --panel: rgba(13, 20, 22, 0.78);
+      --text: #f6f3ee;
+      --muted: rgba(222, 236, 238, 0.68);
+      --line: rgba(0, 229, 255, 0.24);
+      --accent: #00e5ff;
+      --warm: #f3bf26;
+      font-family: Inter, "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 18% 18%, rgba(0, 229, 255, 0.13), transparent 32%),
+        radial-gradient(circle at 80% 12%, rgba(243, 191, 38, 0.08), transparent 28%),
+        linear-gradient(135deg, #06100f 0%, #070809 48%, #101315 100%);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(0, 229, 255, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 229, 255, 0.035) 1px, transparent 1px);
+      background-size: 42px 42px;
+      mask-image: radial-gradient(circle at center, black, transparent 78%);
+    }
+
+    .page {
+      width: min(1120px, calc(100% - 28px));
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: max(20px, env(safe-area-inset-top)) 0 max(28px, env(safe-area-inset-bottom));
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 18px;
+    }
+
+    header,
+    footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 10px;
+      font-weight: 900;
+      letter-spacing: 0;
+    }
+
+    .brand small {
+      color: var(--muted);
+      font-family: "Courier New", monospace;
+      font-size: 11px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+    }
+
+    .back-link,
+    .open-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 0 15px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.035);
+      text-decoration: none;
+      font-size: 13px;
+      white-space: nowrap;
+      transition: transform 180ms ease, border-color 180ms ease, color 180ms ease;
+    }
+
+    .back-link:hover,
+    .open-link:hover {
+      color: var(--accent);
+      border-color: rgba(0, 229, 255, 0.7);
+      transform: translateY(-1px);
+    }
+
+    main {
+      align-self: center;
+      display: grid;
+      gap: 18px;
+    }
+
+    .stage {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--panel);
+      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.42), 0 0 50px rgba(0, 229, 255, 0.08);
+      backdrop-filter: blur(18px);
+    }
+
+    .stage::before,
+    .stage::after {
+      content: "";
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      border: 2px solid var(--accent);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .stage::before {
+      top: -1px;
+      left: -1px;
+      border-right: 0;
+      border-bottom: 0;
+    }
+
+    .stage::after {
+      right: -1px;
+      bottom: -1px;
+      border-left: 0;
+      border-top: 0;
+    }
+
+    video {
+      display: block;
+      width: 100%;
+      max-height: min(74vh, 760px);
+      aspect-ratio: 16 / 9;
+      background: #000;
+      object-fit: contain;
+    }
+
+    .meta {
+      display: grid;
+      gap: 12px;
+      padding: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      background: rgba(0, 0, 0, 0.22);
+    }
+
+    .kicker {
+      margin: 0;
+      color: var(--accent);
+      font-family: "Courier New", monospace;
+      font-size: 12px;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(28px, 6vw, 62px);
+      line-height: 1.02;
+      letter-spacing: 0;
+    }
+
+    .status {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 14px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .open-link {
+      color: #00363d;
+      border-color: transparent;
+      background: var(--accent);
+      font-weight: 800;
+    }
+
+    .open-link.secondary {
+      color: var(--text);
+      border-color: var(--line);
+      background: rgba(255, 255, 255, 0.035);
+      font-weight: 500;
+    }
+
+    footer {
+      color: rgba(222, 236, 238, 0.48);
+      font-family: "Courier New", monospace;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .empty {
+      padding: 52px 18px;
+      text-align: center;
+    }
+
+    .empty h1 {
+      margin-bottom: 10px;
+    }
+
+    @media (max-width: 720px) {
+      .page {
+        width: min(100% - 18px, 1120px);
+        gap: 14px;
+      }
+
+      header {
+        align-items: flex-start;
+      }
+
+      .brand {
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      .back-link {
+        min-height: 38px;
+        padding-inline: 12px;
+        font-size: 12px;
+      }
+
+      video {
+        max-height: 64vh;
+        aspect-ratio: 9 / 16;
+      }
+
+      .meta {
+        padding: 14px;
+      }
+
+      .open-link {
+        width: 100%;
+      }
+
+      footer {
+        display: block;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div class="brand">
+        <span>WUHAO</span>
+        <small>Video Player</small>
+      </div>
+      <a class="back-link" href="index.html#works">返回作品集</a>
+    </header>
+
+    <main id="app">
+      <section class="stage empty">
+        <h1>正在载入视频</h1>
+        <p class="status">如果长时间没有反应，请点击下方备用按钮直接打开视频源。</p>
+      </section>
+    </main>
+
+    <footer>
+      <span>WUHAO AI VIDEO DESIGN</span>
+      <span>Mobile friendly playback</span>
+    </footer>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const src = params.get("src") || "";
+    const title = params.get("title") || "视频作品";
+    const poster = params.get("poster") || "";
+    const app = document.getElementById("app");
+    const safeTitle = title.replace(/[<>]/g, "");
+    const escapeAttr = (value) => value.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    const safeSrc = escapeAttr(src);
+    const safePoster = escapeAttr(poster);
+
+    const setStatus = (message) => {
+      const status = document.querySelector(".status");
+      if (status) status.textContent = message;
+    };
+
+    if (!src) {
+      app.innerHTML = `
+        <section class="stage empty">
+          <h1>没有找到视频链接</h1>
+          <p class="status">请返回作品集重新点击视频封面。</p>
+        </section>
+      `;
+    } else {
+      document.title = `${safeTitle} | WUHAO Video Player`;
+      app.innerHTML = `
+        <section class="stage">
+          <video id="video" controls playsinline webkit-playsinline preload="metadata" ${safePoster ? `poster="${safePoster}"` : ""}>
+            <source src="${safeSrc}" type="video/mp4">
+          </video>
+        </section>
+        <section class="meta">
+          <p class="kicker">AIGC Video</p>
+          <h1>${safeTitle}</h1>
+          <p class="status">视频正在准备播放。移动网络下大文件可能需要等待，请保持页面打开。</p>
+          <div class="actions">
+            <a class="open-link" href="${safeSrc}" target="_blank" rel="noopener noreferrer">新窗口打开原视频</a>
+            <a class="open-link secondary" href="index.html#works">返回作品集</a>
+          </div>
+        </section>
+      `;
+
+      const video = document.getElementById("video");
+      video.addEventListener("loadedmetadata", () => {
+        setStatus("视频已准备好，点击播放器中的播放按钮即可观看。");
+      });
+      video.addEventListener("waiting", () => {
+        setStatus("视频正在缓冲。文件较大时，手机端可能需要多等待一会儿。");
+      });
+      video.addEventListener("playing", () => {
+        setStatus("正在播放。");
+      });
+      video.addEventListener("error", () => {
+        setStatus("当前浏览器加载视频失败，请点击“新窗口打开原视频”尝试播放。");
+      });
+    }
+  </script>
+</body>
+</html>
