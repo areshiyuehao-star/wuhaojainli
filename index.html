@@ -2623,6 +2623,99 @@
       display: grid;
     }
 
+    .video-lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 3100;
+      display: none;
+      place-items: center;
+      padding: clamp(14px, 3vw, 34px);
+      background: rgba(0,0,0,0.88);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+
+    .video-lightbox.is-open {
+      display: grid;
+    }
+
+    .video-lightbox-panel {
+      width: min(1080px, 96vw);
+      display: grid;
+      gap: 14px;
+    }
+
+    .video-lightbox-frame {
+      overflow: hidden;
+      border: 1px solid rgba(0,229,255,0.38);
+      border-radius: 16px;
+      background: #000;
+      box-shadow: 0 30px 90px rgba(0,0,0,0.58), 0 0 44px rgba(0,229,255,0.12);
+    }
+
+    .video-lightbox-player {
+      display: block;
+      width: 100%;
+      max-height: min(74vh, 760px);
+      aspect-ratio: 16 / 9;
+      object-fit: contain;
+      background: #000;
+    }
+
+    .video-lightbox-meta {
+      display: grid;
+      gap: 8px;
+      padding: 14px 16px;
+      border: 1px solid rgba(0,229,255,0.22);
+      border-radius: 14px;
+      background: rgba(14,14,14,0.74);
+      color: rgba(246,243,238,0.78);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .video-lightbox-title {
+      margin: 0;
+      color: var(--cream);
+      font-size: clamp(20px, 4vw, 34px);
+      line-height: 1.15;
+    }
+
+    .video-lightbox-status {
+      margin: 0;
+    }
+
+    .video-lightbox-close {
+      position: fixed;
+      top: 18px;
+      right: 18px;
+      z-index: 3101;
+      width: 46px;
+      height: 46px;
+      border: 1px solid rgba(0,229,255,0.46);
+      border-radius: 999px;
+      color: var(--accent);
+      background: rgba(14,14,14,0.78);
+      cursor: pointer;
+      font-size: 26px;
+    }
+
+    @media (max-width: 720px) {
+      .video-lightbox {
+        align-items: start;
+        padding-top: max(66px, env(safe-area-inset-top));
+      }
+
+      .video-lightbox-player {
+        max-height: 66vh;
+        aspect-ratio: 9 / 16;
+      }
+
+      .video-lightbox-meta {
+        padding: 12px;
+      }
+    }
+
     .image-lightbox img {
       width: 100%;
       height: 100%;
@@ -3996,6 +4089,19 @@
     <div class="image-lightbox-caption" id="image-lightbox-caption"></div>
   </div>
 
+  <div class="video-lightbox" id="video-lightbox" aria-hidden="true" role="dialog" aria-label="视频播放窗口">
+    <button class="video-lightbox-close" id="video-lightbox-close" type="button" aria-label="关闭视频">×</button>
+    <div class="video-lightbox-panel">
+      <div class="video-lightbox-frame">
+        <video class="video-lightbox-player" id="video-lightbox-player" controls playsinline webkit-playsinline preload="metadata"></video>
+      </div>
+      <div class="video-lightbox-meta">
+        <h3 class="video-lightbox-title" id="video-lightbox-title">视频作品</h3>
+        <p class="video-lightbox-status" id="video-lightbox-status">视频正在准备播放。移动网络下大文件可能需要等待，请保持页面打开。</p>
+      </div>
+    </div>
+  </div>
+
   <script>
     const nav = document.querySelector("#site-nav");
     const menuButton = document.querySelector("#menu-toggle");
@@ -4046,6 +4152,11 @@
     const imageLightboxClose = document.querySelector("#image-lightbox-close");
     const imageLightboxPrev = document.querySelector("#image-lightbox-prev");
     const imageLightboxNext = document.querySelector("#image-lightbox-next");
+    const videoLightbox = document.querySelector("#video-lightbox");
+    const videoLightboxPlayer = document.querySelector("#video-lightbox-player");
+    const videoLightboxTitle = document.querySelector("#video-lightbox-title");
+    const videoLightboxStatus = document.querySelector("#video-lightbox-status");
+    const videoLightboxClose = document.querySelector("#video-lightbox-close");
 
     const getGalleryImage = (item) => item?.querySelector(".gallery-art img");
     let imageLightboxItems = [];
@@ -4119,6 +4230,60 @@
         event.preventDefault();
         setImageLightboxItem(imageLightboxIndex + 1);
       }
+    });
+
+    const setVideoLightboxStatus = (message) => {
+      if (videoLightboxStatus) videoLightboxStatus.textContent = message;
+    };
+
+    const openVideoLightbox = ({ title, videoUrl, poster }) => {
+      if (!videoLightbox || !videoLightboxPlayer || !videoUrl) return;
+      if (videoLightboxTitle) videoLightboxTitle.textContent = title || "视频作品";
+      setVideoLightboxStatus("视频正在准备播放。移动网络下大文件可能需要等待，请保持页面打开。");
+      videoLightboxPlayer.pause();
+      videoLightboxPlayer.removeAttribute("src");
+      videoLightboxPlayer.removeAttribute("poster");
+      videoLightboxPlayer.src = videoUrl;
+      if (poster) videoLightboxPlayer.poster = poster;
+      videoLightboxPlayer.load();
+      videoLightbox.classList.add("is-open");
+      videoLightbox.setAttribute("aria-hidden", "false");
+      document.body.classList.add("modal-open");
+      videoLightboxClose?.focus({ preventScroll: true });
+    };
+
+    const closeVideoLightbox = () => {
+      if (!videoLightbox || !videoLightboxPlayer) return;
+      videoLightboxPlayer.pause();
+      videoLightboxPlayer.removeAttribute("src");
+      videoLightboxPlayer.removeAttribute("poster");
+      videoLightboxPlayer.load();
+      videoLightbox.classList.remove("is-open");
+      videoLightbox.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("modal-open");
+      if (videoLightboxTitle) videoLightboxTitle.textContent = "视频作品";
+      setVideoLightboxStatus("视频正在准备播放。移动网络下大文件可能需要等待，请保持页面打开。");
+    };
+
+    videoLightboxClose?.addEventListener("click", closeVideoLightbox);
+    videoLightbox?.addEventListener("click", (event) => {
+      if (event.target === videoLightbox) closeVideoLightbox();
+    });
+    videoLightboxPlayer?.addEventListener("loadedmetadata", () => {
+      setVideoLightboxStatus("视频已准备好，点击播放器中的播放按钮即可观看。");
+    });
+    videoLightboxPlayer?.addEventListener("waiting", () => {
+      setVideoLightboxStatus("视频正在缓冲。文件较大时，手机端可能需要多等待一会儿。");
+    });
+    videoLightboxPlayer?.addEventListener("playing", () => {
+      setVideoLightboxStatus("正在播放。");
+    });
+    videoLightboxPlayer?.addEventListener("error", () => {
+      setVideoLightboxStatus("当前网络或浏览器加载视频较慢，请稍等后重试。");
+    });
+    document.addEventListener("keydown", (event) => {
+      if (!videoLightbox?.classList.contains("is-open")) return;
+      if (event.key === "Escape") closeVideoLightbox();
     });
     const root = document.documentElement;
     const themeMeta = document.querySelector('meta[name="theme-color"]');
@@ -4828,42 +4993,29 @@
     const setupVideoWorksSlider = () => {
       if (!videoWorksGrid) return;
       const missingVideoUrlMessage = "\u8bf7\u5148\u8bbe\u7f6e\u8fd9\u4e2a\u89c6\u9891\u4f5c\u54c1\u7684\u94fe\u63a5";
-      const getPlayerUrl = (card, title) => {
-        const videoUrl = card.dataset.videoUrl?.trim();
-        if (!videoUrl) return "#";
-        const poster = card.querySelector(".work-media img")?.getAttribute("src") || "";
-        const params = new URLSearchParams({
-          src: videoUrl,
-          title,
-          poster
-        });
-        return `video-player.html?${params.toString()}`;
-      };
       videoWorksGrid.querySelectorAll(".work-card").forEach((card, index) => {
         if (!card.dataset.videoUrl) card.dataset.videoUrl = "";
         const media = card.querySelector(".work-media");
         if (!media || media.querySelector(".video-play-link")) return;
         const title = card.querySelector(".work-meta h3")?.textContent?.trim() || `Video ${index + 1}`;
+        const poster = card.querySelector(".work-media img")?.getAttribute("src") || "";
         const playLink = document.createElement("a");
         playLink.className = "video-play-link";
-        playLink.href = getPlayerUrl(card, title);
-        playLink.target = "_blank";
-        playLink.rel = "noopener noreferrer";
+        playLink.href = "#";
         playLink.setAttribute("aria-label", `${title} play video`);
         playLink.innerHTML = '<span class="video-play-core" aria-hidden="true"></span>';
         playLink.addEventListener("click", (event) => {
+          event.preventDefault();
           event.stopPropagation();
           if (document.body.classList.contains("edit-mode")) {
-            event.preventDefault();
             return;
           }
           const videoUrl = card.dataset.videoUrl?.trim();
           if (!videoUrl) {
-            event.preventDefault();
             alert(missingVideoUrlMessage);
             return;
           }
-          playLink.href = getPlayerUrl(card, title);
+          openVideoLightbox({ title, videoUrl, poster });
         });
         media.appendChild(playLink);
       });
