@@ -959,9 +959,12 @@
       display: grid;
       place-items: center;
       color: var(--accent);
-      text-decoration: none;
+      border: 0;
+      padding: 0;
+      appearance: none;
       background: transparent;
       opacity: 0.92;
+      cursor: pointer;
       transition: opacity 220ms ease, background 220ms ease;
     }
 
@@ -4241,8 +4244,12 @@
       if (videoLightboxTitle) videoLightboxTitle.textContent = title || "视频作品";
       setVideoLightboxStatus("视频正在准备播放。移动网络下大文件可能需要等待，请保持页面打开。");
       videoLightboxPlayer.pause();
+      videoLightboxPlayer.src = "";
       videoLightboxPlayer.removeAttribute("src");
       videoLightboxPlayer.removeAttribute("poster");
+      videoLightboxPlayer.dataset.currentVideoUrl = videoUrl;
+      videoLightboxPlayer.dataset.currentVideoTitle = title || "视频作品";
+      videoLightboxPlayer.load();
       videoLightboxPlayer.src = videoUrl;
       if (poster) videoLightboxPlayer.poster = poster;
       videoLightboxPlayer.load();
@@ -4998,26 +5005,29 @@
         const media = card.querySelector(".work-media");
         if (!media || media.querySelector(".video-play-link")) return;
         const title = card.querySelector(".work-meta h3")?.textContent?.trim() || `Video ${index + 1}`;
-        const poster = card.querySelector(".work-media img")?.getAttribute("src") || "";
-        const playLink = document.createElement("a");
+        const playLink = document.createElement("button");
         playLink.className = "video-play-link";
-        playLink.href = "#";
+        playLink.type = "button";
         playLink.setAttribute("aria-label", `${title} play video`);
         playLink.innerHTML = '<span class="video-play-core" aria-hidden="true"></span>';
-        playLink.addEventListener("click", (event) => {
-          event.preventDefault();
-          event.stopPropagation();
-          if (document.body.classList.contains("edit-mode")) {
-            return;
-          }
-          const videoUrl = card.dataset.videoUrl?.trim();
-          if (!videoUrl) {
-            alert(missingVideoUrlMessage);
-            return;
-          }
-          openVideoLightbox({ title, videoUrl, poster });
-        });
         media.appendChild(playLink);
+      });
+
+      videoWorksGrid.addEventListener("click", (event) => {
+        const playButton = event.target.closest(".video-play-link");
+        if (!playButton) return;
+        event.preventDefault();
+        event.stopPropagation();
+        if (document.body.classList.contains("edit-mode")) return;
+        const card = playButton.closest(".work-card");
+        const videoUrl = card?.dataset.videoUrl?.trim() || "";
+        const title = card?.querySelector(".work-meta h3")?.textContent?.trim() || "Video";
+        const poster = card?.querySelector(".work-media img")?.getAttribute("src") || "";
+        if (!videoUrl) {
+          alert(missingVideoUrlMessage);
+          return;
+        }
+        openVideoLightbox({ title, videoUrl, poster });
       });
 
       const getStep = () => {
