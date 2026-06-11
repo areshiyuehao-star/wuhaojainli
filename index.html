@@ -88,6 +88,13 @@
       overflow: hidden;
     }
 
+    body.video-modal-open #site-nav,
+    body.video-modal-open .editor-fab,
+    body.video-modal-open .mobile-menu {
+      visibility: hidden;
+      pointer-events: none;
+    }
+
     body::before {
       content: "";
       position: fixed;
@@ -2629,7 +2636,7 @@
     .video-lightbox {
       position: fixed;
       inset: 0;
-      z-index: 3100;
+      z-index: 2147483000;
       display: none;
       place-items: center;
       padding: clamp(14px, 3vw, 34px);
@@ -2643,9 +2650,35 @@
     }
 
     .video-lightbox-panel {
+      position: relative;
+      z-index: 2147483001;
       width: min(1080px, 96vw);
       display: grid;
       gap: 14px;
+      max-height: calc(100vh - 28px);
+      overflow: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .video-lightbox-toolbar {
+      display: flex;
+      justify-content: flex-end;
+      pointer-events: auto;
+    }
+
+    .video-lightbox-action {
+      min-height: 44px;
+      padding: 0 18px;
+      border: 1px solid rgba(0,229,255,0.52);
+      border-radius: 999px;
+      color: var(--accent);
+      background: rgba(14,14,14,0.82);
+      box-shadow: 0 16px 48px rgba(0,0,0,0.32), 0 0 28px rgba(0,229,255,0.12);
+      cursor: pointer;
+      font: 700 14px/1 "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+      letter-spacing: 0;
+      touch-action: manipulation;
     }
 
     .video-lightbox-frame {
@@ -2690,32 +2723,53 @@
 
     .video-lightbox-close {
       position: fixed;
-      top: 18px;
-      right: 18px;
-      z-index: 3101;
-      width: 46px;
-      height: 46px;
+      top: max(18px, env(safe-area-inset-top));
+      right: max(18px, env(safe-area-inset-right));
+      z-index: 2147483002;
+      width: 54px;
+      height: 54px;
       border: 1px solid rgba(0,229,255,0.46);
       border-radius: 999px;
       color: var(--accent);
       background: rgba(14,14,14,0.78);
+      box-shadow: 0 16px 54px rgba(0,0,0,0.46), 0 0 30px rgba(0,229,255,0.14);
       cursor: pointer;
-      font-size: 26px;
+      font-size: 30px;
     }
 
     @media (max-width: 720px) {
       .video-lightbox {
         align-items: start;
-        padding-top: max(66px, env(safe-area-inset-top));
+        padding-top: max(18px, env(safe-area-inset-top));
+        padding-bottom: max(76px, env(safe-area-inset-bottom));
+      }
+
+      .video-lightbox-panel {
+        width: min(100%, 96vw);
+        max-height: calc(100vh - max(94px, env(safe-area-inset-bottom)));
+      }
+
+      .video-lightbox-toolbar {
+        position: sticky;
+        top: 0;
+        z-index: 2147483003;
+        padding: 2px 0;
+        background: linear-gradient(180deg, rgba(0,0,0,0.92), rgba(0,0,0,0.54));
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
       }
 
       .video-lightbox-player {
-        max-height: 66vh;
+        max-height: 52vh;
         aspect-ratio: 9 / 16;
       }
 
       .video-lightbox-meta {
         padding: 12px;
+      }
+
+      .video-lightbox-action {
+        width: 100%;
       }
     }
 
@@ -4095,10 +4149,14 @@
   <div class="video-lightbox" id="video-lightbox" aria-hidden="true" role="dialog" aria-label="视频播放窗口">
     <button class="video-lightbox-close" id="video-lightbox-close" type="button" aria-label="关闭视频">×</button>
     <div class="video-lightbox-panel">
+      <div class="video-lightbox-toolbar">
+        <button class="video-lightbox-action" type="button" data-video-close>关闭视频</button>
+      </div>
       <div class="video-lightbox-frame" id="video-lightbox-frame"></div>
       <div class="video-lightbox-meta">
         <h3 class="video-lightbox-title" id="video-lightbox-title">视频作品</h3>
         <p class="video-lightbox-status" id="video-lightbox-status">视频正在准备播放。移动网络下大文件可能需要等待，请保持页面打开。</p>
+        <button class="video-lightbox-action" type="button" data-video-close>关闭视频并返回作品集</button>
       </div>
     </div>
   </div>
@@ -4158,6 +4216,7 @@
     const videoLightboxTitle = document.querySelector("#video-lightbox-title");
     const videoLightboxStatus = document.querySelector("#video-lightbox-status");
     const videoLightboxClose = document.querySelector("#video-lightbox-close");
+    const videoLightboxCloseButtons = Array.from(document.querySelectorAll("[data-video-close]"));
     let videoLightboxPlayer = null;
 
     const getGalleryImage = (item) => item?.querySelector(".gallery-art img");
@@ -4295,6 +4354,7 @@
       videoLightbox.classList.add("is-open");
       videoLightbox.setAttribute("aria-hidden", "false");
       document.body.classList.add("modal-open");
+      document.body.classList.add("video-modal-open");
       videoLightboxClose?.focus({ preventScroll: true });
     };
 
@@ -4304,11 +4364,19 @@
       videoLightbox.classList.remove("is-open");
       videoLightbox.setAttribute("aria-hidden", "true");
       document.body.classList.remove("modal-open");
+      document.body.classList.remove("video-modal-open");
       if (videoLightboxTitle) videoLightboxTitle.textContent = "视频作品";
       setVideoLightboxStatus("视频正在准备播放。移动网络下大文件可能需要等待，请保持页面打开。");
     };
 
     videoLightboxClose?.addEventListener("click", closeVideoLightbox);
+    videoLightboxCloseButtons.forEach((button) => {
+      button.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        closeVideoLightbox();
+      });
+    });
     videoLightbox?.addEventListener("click", (event) => {
       if (event.target === videoLightbox) closeVideoLightbox();
     });
