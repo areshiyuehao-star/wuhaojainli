@@ -4095,9 +4095,7 @@
   <div class="video-lightbox" id="video-lightbox" aria-hidden="true" role="dialog" aria-label="视频播放窗口">
     <button class="video-lightbox-close" id="video-lightbox-close" type="button" aria-label="关闭视频">×</button>
     <div class="video-lightbox-panel">
-      <div class="video-lightbox-frame">
-        <video class="video-lightbox-player" id="video-lightbox-player" controls playsinline webkit-playsinline preload="metadata"></video>
-      </div>
+      <div class="video-lightbox-frame" id="video-lightbox-frame"></div>
       <div class="video-lightbox-meta">
         <h3 class="video-lightbox-title" id="video-lightbox-title">视频作品</h3>
         <p class="video-lightbox-status" id="video-lightbox-status">视频正在准备播放。移动网络下大文件可能需要等待，请保持页面打开。</p>
@@ -4156,10 +4154,11 @@
     const imageLightboxPrev = document.querySelector("#image-lightbox-prev");
     const imageLightboxNext = document.querySelector("#image-lightbox-next");
     const videoLightbox = document.querySelector("#video-lightbox");
-    const videoLightboxPlayer = document.querySelector("#video-lightbox-player");
+    const videoLightboxFrame = document.querySelector("#video-lightbox-frame");
     const videoLightboxTitle = document.querySelector("#video-lightbox-title");
     const videoLightboxStatus = document.querySelector("#video-lightbox-status");
     const videoLightboxClose = document.querySelector("#video-lightbox-close");
+    let videoLightboxPlayer = null;
 
     const getGalleryImage = (item) => item?.querySelector(".gallery-art img");
     let imageLightboxItems = [];
@@ -4239,20 +4238,60 @@
       if (videoLightboxStatus) videoLightboxStatus.textContent = message;
     };
 
+    const getFreshVideoUrl = (videoUrl) => {
+      const separator = videoUrl.includes("?") ? "&" : "?";
+      return `${videoUrl}${separator}wuhao_play=${Date.now()}`;
+    };
+
+    const destroyVideoLightboxPlayer = () => {
+      if (videoLightboxPlayer) {
+        videoLightboxPlayer.pause();
+        videoLightboxPlayer.removeAttribute("src");
+        videoLightboxPlayer.removeAttribute("poster");
+        videoLightboxPlayer.load();
+        videoLightboxPlayer.remove();
+      }
+      videoLightboxPlayer = null;
+      videoLightboxFrame?.replaceChildren();
+    };
+
+    const createVideoLightboxPlayer = ({ title, videoUrl, poster }) => {
+      if (!videoLightboxFrame || !videoUrl) return null;
+      destroyVideoLightboxPlayer();
+      const player = document.createElement("video");
+      player.className = "video-lightbox-player";
+      player.controls = true;
+      player.playsInline = true;
+      player.preload = "metadata";
+      player.setAttribute("playsinline", "");
+      player.setAttribute("webkit-playsinline", "");
+      player.dataset.originalVideoUrl = videoUrl;
+      player.dataset.currentVideoTitle = title || "视频作品";
+      player.src = getFreshVideoUrl(videoUrl);
+      if (poster) player.poster = poster;
+      player.addEventListener("loadedmetadata", () => {
+        setVideoLightboxStatus("视频已准备好，点击播放器中的播放按钮即可观看。");
+      });
+      player.addEventListener("waiting", () => {
+        setVideoLightboxStatus("视频正在缓冲。文件较大时，手机端可能需要多等待一会儿。");
+      });
+      player.addEventListener("playing", () => {
+        setVideoLightboxStatus("正在播放。");
+      });
+      player.addEventListener("error", () => {
+        setVideoLightboxStatus("当前网络或浏览器加载视频较慢，请稍等后重试。");
+      });
+      videoLightboxFrame.appendChild(player);
+      videoLightboxPlayer = player;
+      player.load();
+      return player;
+    };
+
     const openVideoLightbox = ({ title, videoUrl, poster }) => {
-      if (!videoLightbox || !videoLightboxPlayer || !videoUrl) return;
+      if (!videoLightbox || !videoUrl) return;
       if (videoLightboxTitle) videoLightboxTitle.textContent = title || "视频作品";
       setVideoLightboxStatus("视频正在准备播放。移动网络下大文件可能需要等待，请保持页面打开。");
-      videoLightboxPlayer.pause();
-      videoLightboxPlayer.src = "";
-      videoLightboxPlayer.removeAttribute("src");
-      videoLightboxPlayer.removeAttribute("poster");
-      videoLightboxPlayer.dataset.currentVideoUrl = videoUrl;
-      videoLightboxPlayer.dataset.currentVideoTitle = title || "视频作品";
-      videoLightboxPlayer.load();
-      videoLightboxPlayer.src = videoUrl;
-      if (poster) videoLightboxPlayer.poster = poster;
-      videoLightboxPlayer.load();
+      createVideoLightboxPlayer({ title, videoUrl, poster });
       videoLightbox.classList.add("is-open");
       videoLightbox.setAttribute("aria-hidden", "false");
       document.body.classList.add("modal-open");
@@ -4260,11 +4299,8 @@
     };
 
     const closeVideoLightbox = () => {
-      if (!videoLightbox || !videoLightboxPlayer) return;
-      videoLightboxPlayer.pause();
-      videoLightboxPlayer.removeAttribute("src");
-      videoLightboxPlayer.removeAttribute("poster");
-      videoLightboxPlayer.load();
+      if (!videoLightbox) return;
+      destroyVideoLightboxPlayer();
       videoLightbox.classList.remove("is-open");
       videoLightbox.setAttribute("aria-hidden", "true");
       document.body.classList.remove("modal-open");
@@ -4275,18 +4311,6 @@
     videoLightboxClose?.addEventListener("click", closeVideoLightbox);
     videoLightbox?.addEventListener("click", (event) => {
       if (event.target === videoLightbox) closeVideoLightbox();
-    });
-    videoLightboxPlayer?.addEventListener("loadedmetadata", () => {
-      setVideoLightboxStatus("视频已准备好，点击播放器中的播放按钮即可观看。");
-    });
-    videoLightboxPlayer?.addEventListener("waiting", () => {
-      setVideoLightboxStatus("视频正在缓冲。文件较大时，手机端可能需要多等待一会儿。");
-    });
-    videoLightboxPlayer?.addEventListener("playing", () => {
-      setVideoLightboxStatus("正在播放。");
-    });
-    videoLightboxPlayer?.addEventListener("error", () => {
-      setVideoLightboxStatus("当前网络或浏览器加载视频较慢，请稍等后重试。");
     });
     document.addEventListener("keydown", (event) => {
       if (!videoLightbox?.classList.contains("is-open")) return;
@@ -5047,9 +5071,9 @@
         event.stopPropagation();
         if (document.body.classList.contains("edit-mode")) return;
         const card = getCardAtPoint(event) || playButton.closest(".work-card");
-        const videoUrl = card?.dataset.videoUrl?.trim() || playButton.dataset.videoUrl?.trim() || "";
-        const title = card?.querySelector(".work-meta h3")?.textContent?.trim() || playButton.dataset.videoTitle || "Video";
-        const poster = card?.querySelector(".work-media img")?.getAttribute("src") || playButton.dataset.videoPoster || "";
+        const videoUrl = playButton.dataset.videoUrl?.trim() || card?.dataset.videoUrl?.trim() || "";
+        const title = playButton.dataset.videoTitle || card?.querySelector(".work-meta h3")?.textContent?.trim() || "Video";
+        const poster = playButton.dataset.videoPoster || card?.querySelector(".work-media img")?.getAttribute("src") || "";
         if (!videoUrl) {
           alert(missingVideoUrlMessage);
           return;
