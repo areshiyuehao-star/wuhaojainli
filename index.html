@@ -4302,13 +4302,49 @@
       return `${videoUrl}${separator}wuhao_play=${Date.now()}`;
     };
 
+    const stopMediaElement = (media) => {
+      if (!media) return;
+      try { media.pause(); } catch (error) {}
+      try { media.muted = true; } catch (error) {}
+      try { media.currentTime = 0; } catch (error) {}
+      try { media.removeAttribute("src"); } catch (error) {}
+      try { media.src = ""; } catch (error) {}
+      try { media.srcObject = null; } catch (error) {}
+      try {
+        media.querySelectorAll?.("source").forEach((source) => {
+          source.removeAttribute("src");
+          source.remove();
+        });
+      } catch (error) {}
+      try { media.load(); } catch (error) {}
+    };
+
+    const exitNativeVideoModes = () => {
+      const exitFullscreen = document.exitFullscreen
+        || document.webkitExitFullscreen
+        || document.msExitFullscreen;
+      if (document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement) {
+        try { exitFullscreen?.call(document); } catch (error) {}
+      }
+      if (document.pictureInPictureElement && document.exitPictureInPicture) {
+        try { document.exitPictureInPicture(); } catch (error) {}
+      }
+    };
+
+    const stopAllPageMedia = () => {
+      exitNativeVideoModes();
+      const mediaElements = new Set([
+        videoLightboxPlayer,
+        ...document.querySelectorAll("video, audio")
+      ].filter(Boolean));
+      mediaElements.forEach(stopMediaElement);
+    };
+
     const destroyVideoLightboxPlayer = () => {
+      stopAllPageMedia();
       if (videoLightboxPlayer) {
-        videoLightboxPlayer.pause();
-        videoLightboxPlayer.removeAttribute("src");
-        videoLightboxPlayer.removeAttribute("poster");
-        videoLightboxPlayer.load();
-        videoLightboxPlayer.remove();
+        try { videoLightboxPlayer.removeAttribute("poster"); } catch (error) {}
+        try { videoLightboxPlayer.remove(); } catch (error) {}
       }
       videoLightboxPlayer = null;
       videoLightboxFrame?.replaceChildren();
@@ -4322,8 +4358,14 @@
       player.controls = true;
       player.playsInline = true;
       player.preload = "metadata";
+      player.disablePictureInPicture = true;
+      player.controlsList = "nodownload noplaybackrate noremoteplayback";
       player.setAttribute("playsinline", "");
       player.setAttribute("webkit-playsinline", "");
+      player.setAttribute("x5-playsinline", "");
+      player.setAttribute("x5-video-player-type", "h5");
+      player.setAttribute("x5-video-player-fullscreen", "false");
+      player.setAttribute("x-webkit-airplay", "deny");
       player.dataset.originalVideoUrl = videoUrl;
       player.dataset.currentVideoTitle = title || "视频作品";
       player.src = getFreshVideoUrl(videoUrl);
@@ -4360,29 +4402,38 @@
 
     const closeVideoLightbox = () => {
       if (!videoLightbox) return;
-      destroyVideoLightboxPlayer();
       videoLightbox.classList.remove("is-open");
       videoLightbox.setAttribute("aria-hidden", "true");
       document.body.classList.remove("modal-open");
       document.body.classList.remove("video-modal-open");
+      destroyVideoLightboxPlayer();
       if (videoLightboxTitle) videoLightboxTitle.textContent = "视频作品";
       setVideoLightboxStatus("视频正在准备播放。移动网络下大文件可能需要等待，请保持页面打开。");
     };
 
-    videoLightboxClose?.addEventListener("click", closeVideoLightbox);
-    videoLightboxCloseButtons.forEach((button) => {
-      button.addEventListener("click", (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        closeVideoLightbox();
-      });
+    const handleVideoCloseRequest = (event) => {
+      const target = event.target?.closest?.("[data-video-close], #video-lightbox-close");
+      if (!target) return;
+      event.preventDefault();
+      event.stopPropagation();
+      closeVideoLightbox();
+    };
+
+    ["click", "pointerup", "touchend"].forEach((eventName) => {
+      document.addEventListener(eventName, handleVideoCloseRequest, { capture: true, passive: false });
     });
+    videoLightboxClose?.addEventListener("click", closeVideoLightbox);
+    videoLightboxCloseButtons.forEach((button) => button.addEventListener("click", closeVideoLightbox));
     videoLightbox?.addEventListener("click", (event) => {
       if (event.target === videoLightbox) closeVideoLightbox();
     });
     document.addEventListener("keydown", (event) => {
       if (!videoLightbox?.classList.contains("is-open")) return;
       if (event.key === "Escape") closeVideoLightbox();
+    });
+    window.addEventListener("pagehide", stopAllPageMedia);
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) stopAllPageMedia();
     });
     const root = document.documentElement;
     const themeMeta = document.querySelector('meta[name="theme-color"]');
