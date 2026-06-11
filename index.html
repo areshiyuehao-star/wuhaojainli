@@ -5005,13 +5005,40 @@
         const media = card.querySelector(".work-media");
         if (!media || media.querySelector(".video-play-link")) return;
         const title = card.querySelector(".work-meta h3")?.textContent?.trim() || `Video ${index + 1}`;
+        const poster = card.querySelector(".work-media img")?.getAttribute("src") || "";
         const playLink = document.createElement("button");
         playLink.className = "video-play-link";
         playLink.type = "button";
+        playLink.dataset.videoUrl = card.dataset.videoUrl || "";
+        playLink.dataset.videoTitle = title;
+        playLink.dataset.videoPoster = poster;
+        playLink.dataset.videoIndex = String(index + 1);
         playLink.setAttribute("aria-label", `${title} play video`);
         playLink.innerHTML = '<span class="video-play-core" aria-hidden="true"></span>';
         media.appendChild(playLink);
       });
+
+      const getCardAtPoint = (event) => {
+        const x = event.clientX;
+        const y = event.clientY;
+        if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
+        const cards = Array.from(videoWorksGrid.querySelectorAll(".work-card"));
+        const hits = cards
+          .map((card) => ({ card, rect: card.getBoundingClientRect() }))
+          .filter(({ rect }) => (
+            x >= rect.left &&
+            x <= rect.right &&
+            y >= rect.top &&
+            y <= rect.bottom
+          ));
+        if (!hits.length) return null;
+        hits.sort((a, b) => {
+          const aDistance = Math.abs(x - (a.rect.left + a.rect.width / 2)) + Math.abs(y - (a.rect.top + a.rect.height / 2));
+          const bDistance = Math.abs(x - (b.rect.left + b.rect.width / 2)) + Math.abs(y - (b.rect.top + b.rect.height / 2));
+          return aDistance - bDistance;
+        });
+        return hits[0].card;
+      };
 
       videoWorksGrid.addEventListener("click", (event) => {
         const playButton = event.target.closest(".video-play-link");
@@ -5019,10 +5046,10 @@
         event.preventDefault();
         event.stopPropagation();
         if (document.body.classList.contains("edit-mode")) return;
-        const card = playButton.closest(".work-card");
-        const videoUrl = card?.dataset.videoUrl?.trim() || "";
-        const title = card?.querySelector(".work-meta h3")?.textContent?.trim() || "Video";
-        const poster = card?.querySelector(".work-media img")?.getAttribute("src") || "";
+        const card = getCardAtPoint(event) || playButton.closest(".work-card");
+        const videoUrl = card?.dataset.videoUrl?.trim() || playButton.dataset.videoUrl?.trim() || "";
+        const title = card?.querySelector(".work-meta h3")?.textContent?.trim() || playButton.dataset.videoTitle || "Video";
+        const poster = card?.querySelector(".work-media img")?.getAttribute("src") || playButton.dataset.videoPoster || "";
         if (!videoUrl) {
           alert(missingVideoUrlMessage);
           return;
