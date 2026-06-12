@@ -4308,8 +4308,8 @@
     </section>
 
     <section class="section page-shell" id="showreel">
-      <div class="showreel reveal" aria-label="2026 作品集混剪原型占位" style="transition-delay: 90ms;">
-        <div class="media-placeholder" role="img" aria-label="WUHAO AI 视频作品集封面"><span data-edit-id="editable-020" class="">WUHAO AI 视频作品集封面</span></div>
+      <div class="showreel reveal" role="button" tabindex="0" data-video-url="https://wuhao-u1p3sf15.cdn.7caiyun.com/%E4%BC%8D%E6%B5%A9%E4%BD%9C%E5%93%81%E9%9B%86%E6%B7%B7%E5%89%AA.mp4" data-video-title="伍浩个人作品集混剪" data-video-poster="assets/portfolio/showreel/showreel-cover.png" aria-label="播放伍浩个人作品集混剪" style="transition-delay: 90ms;">
+        <img src="assets/portfolio/showreel/showreel-cover.png" alt="伍浩个人作品集混剪封面" loading="eager">
         <div class="showreel-content">
           <div>
             <span class="kicker" style="color:rgba(246,243,238,0.62)" data-edit-id="editable-021">2026 Showreel</span>
@@ -5062,6 +5062,24 @@
     window.addEventListener("pagehide", stopAllPageMedia);
     document.addEventListener("visibilitychange", () => {
       if (document.hidden) stopAllPageMedia();
+    });
+
+    const showreelCard = document.querySelector("#showreel .showreel");
+    const playShowreel = () => {
+      if (!showreelCard) return;
+      const videoUrl = showreelCard.dataset.videoUrl?.trim();
+      if (!videoUrl) return;
+      openVideoLightbox({
+        title: showreelCard.dataset.videoTitle || "作品总览",
+        videoUrl,
+        poster: showreelCard.dataset.videoPoster || showreelCard.querySelector("img")?.getAttribute("src") || ""
+      });
+    };
+    showreelCard?.addEventListener("click", playShowreel);
+    showreelCard?.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      event.preventDefault();
+      playShowreel();
     });
     const root = document.documentElement;
     const themeMeta = document.querySelector('meta[name="theme-color"]');
