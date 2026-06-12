@@ -4978,6 +4978,37 @@
       videoLightboxFrame?.replaceChildren();
     };
 
+    const attemptVideoAutoplay = (player) => {
+      if (!player) return;
+      player.autoplay = true;
+      player.muted = false;
+      player.playsInline = true;
+      setVideoLightboxStatus("\u6b63\u5728\u81ea\u52a8\u64ad\u653e\u3002");
+
+      const playPromise = player.play?.();
+      if (!playPromise || typeof playPromise.then !== "function") return;
+
+      playPromise
+        .then(() => {
+          if (videoLightboxPlayer === player) setVideoLightboxStatus("\u6b63\u5728\u64ad\u653e\u3002");
+        })
+        .catch(() => {
+          if (videoLightboxPlayer !== player) return;
+          player.muted = true;
+          player.play?.()
+            ?.then(() => {
+              if (videoLightboxPlayer === player) {
+                setVideoLightboxStatus("\u6d4f\u89c8\u5668\u9650\u5236\u81ea\u52a8\u64ad\u653e\u58f0\u97f3\uff0c\u5df2\u81ea\u52a8\u9759\u97f3\u64ad\u653e\uff0c\u53ef\u5728\u64ad\u653e\u5668\u91cc\u6253\u5f00\u58f0\u97f3\u3002");
+              }
+            })
+            ?.catch(() => {
+              if (videoLightboxPlayer === player) {
+                setVideoLightboxStatus("\u5f53\u524d\u6d4f\u89c8\u5668\u963b\u6b62\u4e86\u81ea\u52a8\u64ad\u653e\uff0c\u8bf7\u70b9\u51fb\u64ad\u653e\u5668\u64ad\u653e\u3002");
+              }
+            });
+        });
+    };
+
     const createVideoLightboxPlayer = ({ title, videoUrl, poster }) => {
       if (!videoLightboxFrame || !videoUrl) return null;
       destroyVideoLightboxPlayer();
@@ -4985,7 +5016,8 @@
       player.className = "video-lightbox-player";
       player.controls = true;
       player.playsInline = true;
-      player.preload = "metadata";
+      player.autoplay = true;
+      player.preload = "auto";
       player.disablePictureInPicture = true;
       player.controlsList = "nodownload noplaybackrate noremoteplayback";
       player.setAttribute("playsinline", "");
@@ -5020,11 +5052,12 @@
       if (!videoLightbox || !videoUrl) return;
       if (videoLightboxTitle) videoLightboxTitle.textContent = title || "视频作品";
       setVideoLightboxStatus("视频正在准备播放。移动网络下大文件可能需要等待，请保持页面打开。");
-      createVideoLightboxPlayer({ title, videoUrl, poster });
+      const player = createVideoLightboxPlayer({ title, videoUrl, poster });
       videoLightbox.classList.add("is-open");
       videoLightbox.setAttribute("aria-hidden", "false");
       document.body.classList.add("modal-open");
       document.body.classList.add("video-modal-open");
+      attemptVideoAutoplay(player);
       videoLightboxClose?.focus({ preventScroll: true });
     };
 
