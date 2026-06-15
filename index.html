@@ -4921,6 +4921,20 @@
       if (videoLightboxStatus) videoLightboxStatus.textContent = message;
     };
 
+    const clearVideoPoster = (player) => {
+      if (!player) return;
+      try { player.removeAttribute("poster"); } catch (error) {}
+      try { player.poster = ""; } catch (error) {}
+    };
+
+    const checkVideoFrameVisibility = (player) => {
+      if (!player || videoLightboxPlayer !== player) return;
+      if (!player.paused && player.currentTime > 1 && (!player.videoWidth || !player.videoHeight)) {
+        clearVideoPoster(player);
+        setVideoLightboxStatus("视频声音已播放，但当前浏览器可能不支持这个视频编码。建议使用 Chrome/Edge/Safari 最新版，或将视频重新导出为 H.264 MP4。");
+      }
+    };
+
     const getFreshVideoUrl = (videoUrl) => {
       const separator = videoUrl.includes("?") ? "&" : "?";
       return `${videoUrl}${separator}wuhao_play=${Date.now()}`;
@@ -4986,7 +5000,11 @@
 
       playPromise
         .then(() => {
-          if (videoLightboxPlayer === player) setVideoLightboxStatus("\u6b63\u5728\u64ad\u653e\u3002");
+          if (videoLightboxPlayer === player) {
+            clearVideoPoster(player);
+            setVideoLightboxStatus("\u6b63\u5728\u64ad\u653e\u3002");
+            window.setTimeout(() => checkVideoFrameVisibility(player), 1600);
+          }
         })
         .catch(() => {
           if (videoLightboxPlayer !== player) return;
@@ -4994,7 +5012,9 @@
           player.play?.()
             ?.then(() => {
               if (videoLightboxPlayer === player) {
+                clearVideoPoster(player);
                 setVideoLightboxStatus("\u6d4f\u89c8\u5668\u9650\u5236\u81ea\u52a8\u64ad\u653e\u58f0\u97f3\uff0c\u5df2\u81ea\u52a8\u9759\u97f3\u64ad\u653e\uff0c\u53ef\u5728\u64ad\u653e\u5668\u91cc\u6253\u5f00\u58f0\u97f3\u3002");
+                window.setTimeout(() => checkVideoFrameVisibility(player), 1600);
               }
             })
             ?.catch(() => {
@@ -5025,18 +5045,35 @@
       player.dataset.originalVideoUrl = videoUrl;
       player.dataset.currentVideoTitle = title || "视频作品";
       player.src = getFreshVideoUrl(videoUrl);
-      if (poster) player.poster = poster;
+      player.dataset.videoPoster = poster || "";
       player.addEventListener("loadedmetadata", () => {
-        setVideoLightboxStatus("视频已准备好，点击播放器中的播放按钮即可观看。");
+        clearVideoPoster(player);
+        setVideoLightboxStatus("视频已准备好，正在播放。");
+      });
+      player.addEventListener("loadeddata", () => {
+        clearVideoPoster(player);
+        setVideoLightboxStatus("正在播放。");
+      });
+      player.addEventListener("canplay", () => {
+        clearVideoPoster(player);
       });
       player.addEventListener("waiting", () => {
         setVideoLightboxStatus("视频正在缓冲。文件较大时，手机端可能需要多等待一会儿。");
       });
+      player.addEventListener("play", () => {
+        clearVideoPoster(player);
+      });
       player.addEventListener("playing", () => {
+        clearVideoPoster(player);
         setVideoLightboxStatus("正在播放。");
+        window.setTimeout(() => checkVideoFrameVisibility(player), 1600);
+      });
+      player.addEventListener("timeupdate", () => {
+        if (player.currentTime > 0.2) clearVideoPoster(player);
       });
       player.addEventListener("error", () => {
-        setVideoLightboxStatus("当前网络或浏览器加载视频较慢，请稍等后重试。");
+        clearVideoPoster(player);
+        setVideoLightboxStatus("当前浏览器加载或解码视频失败。请刷新重试，或使用支持 H.264 MP4 的浏览器打开。");
       });
       videoLightboxFrame.appendChild(player);
       videoLightboxPlayer = player;
