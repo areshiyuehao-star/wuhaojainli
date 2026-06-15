@@ -533,15 +533,16 @@
     }
 
     .hero {
-      min-height: calc(100vh - 78px);
+      min-height: auto;
       display: grid;
       align-items: center;
-      padding: 82px 0 72px;
+      padding: 54px 0 64px;
       position: relative;
     }
 
     .hero::before {
       content: "PORTFOLIO / 2026";
+      display: none;
       position: absolute;
       left: 0;
       top: 34px;
@@ -1297,20 +1298,22 @@
     }
 
     .skill-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
       margin-top: 24px;
     }
 
     .skill {
-      padding: 9px 12px;
+      min-height: 120px;
+      padding: 16px 18px;
       border-radius: 12px;
       border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--line));
       background: color-mix(in srgb, var(--accent) 8%, transparent);
       color: var(--accent);
       font-size: 13px;
       font-weight: 700;
+      line-height: 1.85;
       transition: transform 220ms var(--ease-out), border-color 180ms ease, background 180ms ease;
     }
 
@@ -1785,12 +1788,14 @@
     }
 
     .neo-interface .hero {
-      min-height: calc(100vh - 76px);
-      padding-top: clamp(72px, 9vw, 128px);
+      min-height: auto;
+      padding-top: clamp(38px, 5vw, 70px);
+      padding-bottom: clamp(52px, 7vw, 82px);
     }
 
     .neo-interface .hero::before {
       content: "PORTFOLIO / 2026";
+      display: none;
       color: rgba(186,201,204,0.62);
       font-family: "JetBrains Mono", Consolas, monospace;
     }
@@ -2184,9 +2189,10 @@
     /* Portfolio additions: photo frame, graphic gallery, and layout editor */
     .hero-side-stack {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(150px, 210px);
-      gap: 18px;
+      grid-template-columns: 150px minmax(150px, 210px);
+      gap: 10px;
       align-items: stretch;
+      justify-content: start;
     }
 
     .profile-photo-frame {
@@ -2240,6 +2246,7 @@
 
     .profile-photo-frame.has-photo img {
       opacity: 0.9;
+      filter: grayscale(0.08);
     }
 
     .profile-photo-frame:hover img {
@@ -3167,12 +3174,13 @@
       }
 
       .skill-list {
+        grid-template-columns: 1fr;
         gap: 8px;
       }
 
       .skill {
-        min-height: 38px;
-        padding: 0 12px;
+        min-height: auto;
+        padding: 12px 14px;
       }
 
       .contact-list a,
@@ -4276,16 +4284,14 @@
     <section class="hero page-shell">
       <div class="hero-grid">
         <div class="reveal" style="transition-delay: 0ms;">
-          <span class="eyebrow" data-edit-id="editable-005">AIGC VIDEO DESIGNER</span>
+          <span class="eyebrow" data-edit-id="editable-005">Personal Portfolio</span>
           <h1>
             <span class="hero-name" data-edit-id="editable-006" style="font-weight: 700; font-size: 150px; padding: 17px; text-align: left;">伍浩</span>
             <span class="hero-roman" data-edit-id="editable-007" style="font-size: 150px; text-align: left;">WUHAO</span>
           </h1>
-          <p class="hero-copy" data-edit-id="editable-008">精通全流程AIGC制作，具有丰富的试听语言和导演思维以及项目实战经验。同时具有优秀的艺术审美意识。</p>
+          <p class="hero-copy" data-edit-id="editable-008">精通全流程AIGC制作，具有丰富的试听语言和导演思维以及项目实战经验。同时具有丰富的设计经验，优秀的艺术审美意识。</p>
           <div class="hero-actions">
             <a class="button primary" href="#works" data-edit-id="editable-009">查看作品 ↓</a>
-            <span class="button prototype-disabled" aria-disabled="true" style="">下载 PDF 简历</span>
-            <a class="button" href="mailto:3115362321@qq.com" data-edit-id="editable-010" style="">联系合作</a>
           </div>
         </div>
         <div class="hero-side-stack reveal" style="transition-delay: 45ms;">
@@ -4298,8 +4304,8 @@
               <li><strong data-edit-id="editable-018" class="">后期完成</strong><span data-edit-id="editable-019" class=""></span></li>
             </ul>
           </aside>
-          <aside class="profile-photo-frame" id="profile-photo-frame" aria-label="个人照片框">
-            <img id="profile-photo-img" alt="WUHAO 个人照片">
+          <aside class="profile-photo-frame has-photo" id="profile-photo-frame" aria-label="个人照片框">
+            <img id="profile-photo-img" src="assets/profile-photo.jpg" alt="WUHAO 个人照片">
             <div class="photo-placeholder" data-edit-id="editable-photo-placeholder">PERSONAL PHOTO</div>
             <label class="photo-upload-label">嵌入照片<input id="profile-photo-input" type="file" accept="image/*"></label>
           </aside>
@@ -4344,7 +4350,7 @@
             </div>
             <div class="work-meta">
               <h3 data-edit-id="editable-video-01-title">别惹我我防御拉满</h3>
-              <p data-edit-id="editable-video-01-desc">视频作品封面展示，点击播放按钮可跳转到对应视频链接。</p>
+              <p data-edit-id="editable-video-01-desc">3D漫剧项目，该漫剧《别惹我我防御拉满》，上线一天登上新晋榜top2，并且在红果有着5000w热度</p>
               <div class="tag-row">
                 <span class="tag" data-edit-id="editable-video-01-tag-1">AIGC Video</span>
                 <span class="tag" data-edit-id="editable-video-01-tag-2">Video Editing</span>
@@ -4358,7 +4364,7 @@
             </div>
             <div class="work-meta">
               <h3 data-edit-id="editable-video-02-title">别惹我我防御拉满2D</h3>
-              <p data-edit-id="editable-video-02-desc">视频作品封面展示，点击播放按钮可跳转到对应视频链接。</p>
+              <p data-edit-id="editable-video-02-desc">该作品为《别惹我我防御拉满》2d版，初期原定制作2d风格，后因平台需求转化为3d风格</p>
               <div class="tag-row">
                 <span class="tag" data-edit-id="editable-video-02-tag-1">AIGC Video</span>
                 <span class="tag" data-edit-id="editable-video-02-tag-2">Video Editing</span>
@@ -4372,7 +4378,7 @@
             </div>
             <div class="work-meta">
               <h3 data-edit-id="editable-video-03-title">提线</h3>
-              <p data-edit-id="editable-video-03-desc">视频作品封面展示，点击播放按钮可跳转到对应视频链接。</p>
+              <p data-edit-id="editable-video-03-desc">3D风格剧情向精品漫剧，为体现个人综合实力耗费时间和精力打磨而成</p>
               <div class="tag-row">
                 <span class="tag" data-edit-id="editable-video-03-tag-1">AIGC Video</span>
                 <span class="tag" data-edit-id="editable-video-03-tag-2">Cover Design</span>
@@ -4723,15 +4729,8 @@
           <span class="kicker" data-edit-id="editable-085">Technical Palette</span>
           <h2 data-edit-id="editable-086" class="">熟练的技能</h2>
           <div class="skill-list" aria-label="技能标签">
-            <span class="skill" data-edit-id="editable-087">After Effects</span>
-            <span class="skill" data-edit-id="editable-088">Premiere Pro</span>
-            <span class="skill" data-edit-id="editable-089">Photoshop</span>
-            <span class="skill" data-edit-id="editable-090">Midjourney</span>
-            <span class="skill" data-edit-id="editable-091">ComfyUI</span>
-            <span class="skill" data-edit-id="editable-092">Runway</span>
-            <span class="skill" data-edit-id="editable-093">Seedance</span>
-            <span class="skill" data-edit-id="editable-094">Nanobanana</span>
-            <span class="skill" data-edit-id="editable-095">Vibe Coding</span>
+            <span class="skill" data-edit-id="editable-087">各类设计及动画视频工具（Photoshop，illustrator，figma，animate，剪映，AE）</span>
+            <span class="skill" data-edit-id="editable-088">各类AIGC工具（Seedance，ChatGPT，ComfyUI，Midjourney，Runway，Nanobanana，vidu，kling，hailuo等......）</span>
           </div>
         </div>
         <div class="reveal" style="transition-delay: 260ms;">
@@ -4751,9 +4750,6 @@
               <a href="tel:18173754824" data-edit-id="editable-103" class="">18173754824</a>
             </li>
           </ul>
-          <div class="hero-actions" style="margin-top:0;">
-            <span class="button prototype-disabled" aria-disabled="true">下载 PDF 简历</span>
-          </div>
         </div>
       </div>
     </section>
