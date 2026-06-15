@@ -1021,7 +1021,7 @@
       display: block;
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: contain;
       background: var(--surface-2);
     }
 
@@ -2703,6 +2703,62 @@
       aspect-ratio: 16 / 9;
       object-fit: contain;
       background: #000;
+    }
+
+    .inline-video-shell {
+      position: relative;
+      z-index: 20;
+      display: grid;
+      grid-template-rows: auto minmax(220px, 1fr) auto;
+      gap: 8px;
+      width: 100%;
+      min-height: min(72vh, 620px);
+      padding: 10px;
+      background: #000;
+      border: 1px solid rgba(0,229,255,0.52);
+      border-radius: var(--radius);
+      box-shadow: 0 18px 64px rgba(0,0,0,0.5), 0 0 34px rgba(0,229,255,0.14);
+      touch-action: manipulation;
+      pointer-events: auto;
+    }
+
+    .work-card .inline-video-shell {
+      min-height: min(78vh, 560px);
+      scroll-snap-align: start;
+    }
+
+    .inline-video-toolbar {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      pointer-events: auto;
+    }
+
+    .inline-video-close {
+      position: relative;
+      z-index: 22;
+      min-height: 38px;
+      padding: 0 14px;
+      border: 1px solid rgba(0,229,255,0.58);
+      border-radius: 999px;
+      color: var(--accent);
+      background: rgba(14,14,14,0.9);
+      font: 700 13px/1 "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+      cursor: pointer;
+      pointer-events: auto;
+      touch-action: manipulation;
+    }
+
+    .inline-video-status {
+      margin: 0;
+      color: rgba(246,243,238,0.72);
+      font-size: 12px;
+      line-height: 1.4;
+      text-align: center;
+    }
+
+    .inline-video-active {
+      display: none !important;
     }
 
     .video-lightbox-meta {
@@ -4842,6 +4898,10 @@
     const videoLightboxClose = document.querySelector("#video-lightbox-close");
     const videoLightboxCloseButtons = Array.from(document.querySelectorAll("[data-video-close]"));
     let videoLightboxPlayer = null;
+    let inlineVideoShell = null;
+    let inlineVideoPlayer = null;
+    let inlineVideoHost = null;
+    let lastInlineVideoCloseAt = 0;
 
     const getGalleryImage = (item) => item?.querySelector(".gallery-art img");
     let imageLightboxItems = [];
@@ -4940,6 +5000,11 @@
       return `${videoUrl}${separator}wuhao_play=${Date.now()}`;
     };
 
+    const shouldUseInlineVideo = () => (
+      window.matchMedia("(max-width: 820px)").matches ||
+      window.matchMedia("(pointer: coarse)").matches
+    );
+
     const stopMediaElement = (media) => {
       if (!media) return;
       try { media.pause(); } catch (error) {}
@@ -4973,9 +5038,27 @@
       exitNativeVideoModes();
       const mediaElements = new Set([
         videoLightboxPlayer,
+        inlineVideoPlayer,
         ...document.querySelectorAll("video, audio")
       ].filter(Boolean));
       mediaElements.forEach(stopMediaElement);
+    };
+
+    const closeInlineVideo = () => {
+      const hadInlineVideo = Boolean(inlineVideoShell || inlineVideoPlayer || inlineVideoHost);
+      if (inlineVideoPlayer) {
+        stopMediaElement(inlineVideoPlayer);
+      }
+      if (inlineVideoHost) {
+        inlineVideoHost.classList.remove("inline-video-active");
+      }
+      if (inlineVideoShell) {
+        try { inlineVideoShell.remove(); } catch (error) {}
+      }
+      inlineVideoShell = null;
+      inlineVideoPlayer = null;
+      inlineVideoHost = null;
+      if (hadInlineVideo) lastInlineVideoCloseAt = Date.now();
     };
 
     const destroyVideoLightboxPlayer = () => {
@@ -4986,6 +5069,79 @@
       }
       videoLightboxPlayer = null;
       videoLightboxFrame?.replaceChildren();
+    };
+
+    const createInlineVideoPlayer = ({ host, title, videoUrl, poster }) => {
+      if (!host || !videoUrl) return null;
+      closeVideoLightbox();
+      closeInlineVideo();
+      const shell = document.createElement("div");
+      shell.className = "inline-video-shell";
+      shell.innerHTML = `
+        <div class="inline-video-toolbar">
+          <button class="inline-video-close" type="button">关闭视频</button>
+        </div>
+        <video class="work-video" controls playsinline webkit-playsinline x5-playsinline x5-video-player-type="h5" x5-video-player-fullscreen="false" preload="auto"></video>
+        <p class="inline-video-status">视频正在准备播放。</p>
+      `;
+      const player = shell.querySelector("video");
+      const status = shell.querySelector(".inline-video-status");
+      const closeButton = shell.querySelector(".inline-video-close");
+      player.controls = true;
+      player.playsInline = true;
+      player.autoplay = true;
+      player.disablePictureInPicture = true;
+      player.controlsList = "nodownload noplaybackrate noremoteplayback";
+      player.setAttribute("aria-label", title || "视频作品");
+      player.setAttribute("x-webkit-airplay", "deny");
+      player.dataset.currentVideoTitle = title || "视频作品";
+      player.dataset.videoPoster = poster || "";
+      player.src = getFreshVideoUrl(videoUrl);
+      player.addEventListener("loadedmetadata", () => {
+        clearVideoPoster(player);
+        if (status) status.textContent = "视频已准备好。";
+      });
+      player.addEventListener("playing", () => {
+        clearVideoPoster(player);
+        if (status) status.textContent = "正在播放。";
+      });
+      player.addEventListener("pause", () => {
+        if (status && inlineVideoPlayer === player) status.textContent = "已暂停，可继续播放或关闭。";
+      });
+      player.addEventListener("waiting", () => {
+        if (status) status.textContent = "视频正在缓冲，请稍等。";
+      });
+      player.addEventListener("error", () => {
+        if (status) status.textContent = "当前浏览器加载视频失败，请刷新后重试。";
+      });
+      const requestInlineClose = (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        closeInlineVideo();
+      };
+      ["pointerdown", "touchstart", "click"].forEach((eventName) => {
+        closeButton?.addEventListener(eventName, requestInlineClose, { passive: false });
+      });
+      shell.addEventListener("click", (event) => {
+        event.stopPropagation();
+      });
+      ["pointerdown", "touchstart", "touchmove", "touchend"].forEach((eventName) => {
+        shell.addEventListener(eventName, (event) => {
+          if (event.target?.closest?.(".inline-video-close")) return;
+          event.stopPropagation();
+        }, { passive: true });
+      });
+      host.insertAdjacentElement("afterend", shell);
+      host.classList.add("inline-video-active");
+      inlineVideoShell = shell;
+      inlineVideoPlayer = player;
+      inlineVideoHost = host;
+      player.load();
+      player.play?.().catch(() => {
+        if (status) status.textContent = "请点击播放器播放。";
+      });
+      shell.scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" });
+      return player;
     };
 
     const attemptVideoAutoplay = (player) => {
@@ -5116,6 +5272,16 @@
     ["click", "pointerup", "touchend"].forEach((eventName) => {
       document.addEventListener(eventName, handleVideoCloseRequest, { capture: true, passive: false });
     });
+    const handleInlineVideoCloseRequest = (event) => {
+      const target = event.target?.closest?.(".inline-video-close");
+      if (!target) return;
+      event.preventDefault();
+      event.stopPropagation();
+      closeInlineVideo();
+    };
+    ["click", "pointerdown", "pointerup", "touchstart", "touchend"].forEach((eventName) => {
+      document.addEventListener(eventName, handleInlineVideoCloseRequest, { capture: true, passive: false });
+    });
     videoLightboxClose?.addEventListener("click", closeVideoLightbox);
     videoLightboxCloseButtons.forEach((button) => button.addEventListener("click", closeVideoLightbox));
     videoLightbox?.addEventListener("click", (event) => {
@@ -5125,20 +5291,34 @@
       if (!videoLightbox?.classList.contains("is-open")) return;
       if (event.key === "Escape") closeVideoLightbox();
     });
-    window.addEventListener("pagehide", stopAllPageMedia);
+    window.addEventListener("pagehide", () => {
+      closeInlineVideo();
+      stopAllPageMedia();
+    });
     document.addEventListener("visibilitychange", () => {
-      if (document.hidden) stopAllPageMedia();
+      if (document.hidden) {
+        closeInlineVideo();
+        stopAllPageMedia();
+      }
     });
 
     const showreelCard = document.querySelector("#showreel .showreel");
     const playShowreel = () => {
       if (!showreelCard) return;
+      if (Date.now() - lastInlineVideoCloseAt < 700) return;
       const videoUrl = showreelCard.dataset.videoUrl?.trim();
       if (!videoUrl) return;
-      openVideoLightbox({
+      const payload = {
         title: showreelCard.dataset.videoTitle || "作品总览",
         videoUrl,
         poster: showreelCard.dataset.videoPoster || showreelCard.querySelector("img")?.getAttribute("src") || ""
+      };
+      if (shouldUseInlineVideo()) {
+        createInlineVideoPlayer({ host: showreelCard, ...payload });
+        return;
+      }
+      openVideoLightbox({
+        ...payload
       });
     };
     showreelCard?.addEventListener("click", playShowreel);
@@ -5901,12 +6081,18 @@
         event.preventDefault();
         event.stopPropagation();
         if (document.body.classList.contains("edit-mode")) return;
+        if (Date.now() - lastInlineVideoCloseAt < 700) return;
         const card = getCardAtPoint(event) || playButton.closest(".work-card");
         const videoUrl = playButton.dataset.videoUrl?.trim() || card?.dataset.videoUrl?.trim() || "";
         const title = playButton.dataset.videoTitle || card?.querySelector(".work-meta h3")?.textContent?.trim() || "Video";
         const poster = playButton.dataset.videoPoster || card?.querySelector(".work-media img")?.getAttribute("src") || "";
         if (!videoUrl) {
           alert(missingVideoUrlMessage);
+          return;
+        }
+        if (shouldUseInlineVideo()) {
+          const host = card?.querySelector(".work-media");
+          createInlineVideoPlayer({ host, title, videoUrl, poster });
           return;
         }
         openVideoLightbox({ title, videoUrl, poster });
