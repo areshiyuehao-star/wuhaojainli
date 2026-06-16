@@ -95,6 +95,19 @@
       pointer-events: none;
     }
 
+    body.mobile-video-open {
+      overflow: hidden;
+      touch-action: none;
+      overscroll-behavior: none;
+    }
+
+    body.mobile-video-open #site-nav,
+    body.mobile-video-open .editor-fab,
+    body.mobile-video-open .mobile-menu {
+      visibility: hidden;
+      pointer-events: none;
+    }
+
     body::before {
       content: "";
       position: fixed;
@@ -2725,11 +2738,38 @@
     }
 
     .mobile-video-stage {
-      max-width: min(100%, 960px);
-      margin-inline: auto;
+      position: fixed;
+      inset: 0;
+      z-index: 2147483200;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto auto;
+      width: 100vw;
+      min-height: 100vh;
+      min-height: 100dvh;
+      max-width: none;
+      margin: 0;
+      padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(14px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+      border: 0;
+      border-radius: 0;
+      background:
+        radial-gradient(circle at 50% 28%, rgba(0,229,255,0.12), transparent 38%),
+        rgba(0,0,0,0.96);
+      box-shadow: none;
+      overflow: hidden;
+      overscroll-behavior: contain;
+      touch-action: none;
+      isolation: isolate;
+      margin-inline: 0;
     }
 
     .mobile-video-stage .work-video {
+      display: block;
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      max-height: none;
+      aspect-ratio: auto;
+      object-fit: contain;
       pointer-events: none;
       -webkit-touch-callout: none;
     }
@@ -2741,6 +2781,12 @@
       align-items: center;
       gap: 8px;
       pointer-events: auto;
+    }
+
+    .mobile-video-stage-head {
+      position: relative;
+      z-index: 2;
+      padding: 2px 0 8px;
     }
 
     .mobile-video-stage-title {
@@ -2767,9 +2813,9 @@
     .inline-video-close {
       position: relative;
       z-index: 22;
-      min-height: 38px;
+      min-height: 42px;
       flex: 0 0 auto;
-      padding: 0 14px;
+      padding: 0 16px;
       border: 1px solid rgba(0,229,255,0.58);
       border-radius: 999px;
       color: var(--accent);
@@ -2787,6 +2833,8 @@
       gap: 10px;
       padding-top: 2px;
       pointer-events: auto;
+      position: relative;
+      z-index: 2;
     }
 
     .mobile-video-play-toggle,
@@ -2809,6 +2857,8 @@
     }
 
     .inline-video-status {
+      position: relative;
+      z-index: 2;
       margin: 0;
       color: rgba(246,243,238,0.72);
       font-size: 12px;
@@ -5151,6 +5201,7 @@
       inlineVideoShell = null;
       inlineVideoPlayer = null;
       inlineVideoHost = null;
+      document.body.classList.remove("mobile-video-open");
       if (hadInlineVideo && inlineVideoHistoryArmed && !fromHistory && !keepHistory) {
         inlineVideoHistoryArmed = false;
         suppressNextInlineVideoPopstate = true;
@@ -5204,7 +5255,6 @@
       closeVideoLightbox();
       closeInlineVideo({ keepHistory: true });
       armInlineVideoHistory();
-      const anchor = getMobileVideoAnchor(host);
       const shell = document.createElement("div");
       shell.className = "mobile-video-stage";
       shell.setAttribute("role", "region");
@@ -5245,6 +5295,7 @@
       player.setAttribute("x5-playsinline", "");
       player.setAttribute("x5-video-player-type", "h5");
       player.setAttribute("x5-video-player-fullscreen", "false");
+      player.setAttribute("x5-video-orientation", "portrait");
       player.setAttribute("aria-label", title || "视频作品");
       player.setAttribute("x-webkit-airplay", "deny");
       player.dataset.currentVideoTitle = title || "视频作品";
@@ -5319,6 +5370,12 @@
       };
       playToggle?.addEventListener("click", toggleInlineVideo);
       replayButton?.addEventListener("click", replayInlineVideo);
+      ["click", "dblclick", "contextmenu", "touchstart", "touchend", "pointerdown", "pointerup"].forEach((eventName) => {
+        player.addEventListener(eventName, (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+        }, { passive: false });
+      });
       const requestInlineClose = (event) => {
         event.preventDefault();
         event.stopPropagation();
@@ -5336,14 +5393,14 @@
           event.stopPropagation();
         }, { passive: true });
       });
-      anchor?.insertAdjacentElement("afterend", shell);
+      document.body.appendChild(shell);
+      document.body.classList.add("mobile-video-open");
       host.classList.add("inline-video-active");
       inlineVideoShell = shell;
       inlineVideoPlayer = player;
       inlineVideoHost = host;
       player.load();
       playInlineVideo();
-      shell.scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" });
       return player;
     };
 
