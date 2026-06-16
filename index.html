@@ -2669,6 +2669,10 @@
       display: grid;
     }
 
+    .video-lightbox[hidden] {
+      display: none !important;
+    }
+
     .video-lightbox-panel {
       position: relative;
       z-index: 2147483001;
@@ -5052,13 +5056,15 @@
     <div class="image-lightbox-caption" id="image-lightbox-caption"></div>
   </div>
 
-  <div class="video-lightbox" id="video-lightbox" aria-hidden="true" role="dialog" aria-label="视频播放窗口">
+  <div class="video-lightbox" id="video-lightbox" aria-hidden="true" role="dialog" aria-label="视频播放窗口" hidden>
     <button class="video-lightbox-close" id="video-lightbox-close" type="button" aria-label="关闭视频">×</button>
     <div class="video-lightbox-panel">
       <div class="video-lightbox-toolbar">
         <button class="video-lightbox-action" type="button" data-video-close>关闭视频</button>
       </div>
-      <div class="video-lightbox-frame" id="video-lightbox-frame"></div>
+      <div class="video-lightbox-frame" id="video-lightbox-frame">
+        <video class="video-lightbox-player" id="video-lightbox-player" controls playsinline webkit-playsinline preload="metadata" hidden></video>
+      </div>
       <div class="video-lightbox-meta">
         <h3 class="video-lightbox-title" id="video-lightbox-title">视频作品</h3>
         <p class="video-lightbox-status" id="video-lightbox-status">视频正在准备播放。移动网络下大文件可能需要等待，请保持页面打开。</p>
@@ -5119,11 +5125,13 @@
     const imageLightboxNext = document.querySelector("#image-lightbox-next");
     const videoLightbox = document.querySelector("#video-lightbox");
     const videoLightboxFrame = document.querySelector("#video-lightbox-frame");
+    let videoLightboxPlayerElement = document.querySelector("#video-lightbox-player");
     const videoLightboxTitle = document.querySelector("#video-lightbox-title");
     const videoLightboxStatus = document.querySelector("#video-lightbox-status");
     const videoLightboxClose = document.querySelector("#video-lightbox-close");
     const videoLightboxCloseButtons = Array.from(document.querySelectorAll("[data-video-close]"));
     let videoLightboxPlayer = null;
+    let videoLightboxOpenToken = 0;
     let inlineVideoShell = null;
     let inlineVideoPlayer = null;
     let inlineVideoHost = null;
@@ -5379,13 +5387,35 @@
     };
 
     const destroyVideoLightboxPlayer = () => {
-      stopAllPageMedia();
-      if (videoLightboxPlayer) {
-        try { videoLightboxPlayer.removeAttribute("poster"); } catch (error) {}
-        try { videoLightboxPlayer.remove(); } catch (error) {}
+      videoLightboxOpenToken += 1;
+      const player = videoLightboxPlayer || videoLightboxPlayerElement;
+      if (player) {
+        try { player.pause(); } catch (error) {}
+        try { player.muted = true; } catch (error) {}
+        try { player.volume = 0; } catch (error) {}
+        try { player.currentTime = 0; } catch (error) {}
+        try { player.removeAttribute("poster"); } catch (error) {}
+        try { player.removeAttribute("src"); } catch (error) {}
+        try { player.src = ""; } catch (error) {}
+        try { player.srcObject = null; } catch (error) {}
+        try { player.load(); } catch (error) {}
+        player.hidden = true;
+        if (player.isConnected && videoLightboxFrame) {
+          const cleanPlayer = player.cloneNode(false);
+          cleanPlayer.className = "video-lightbox-player";
+          cleanPlayer.id = "video-lightbox-player";
+          cleanPlayer.controls = true;
+          cleanPlayer.playsInline = true;
+          cleanPlayer.preload = "metadata";
+          cleanPlayer.hidden = true;
+          cleanPlayer.setAttribute("playsinline", "");
+          cleanPlayer.setAttribute("webkit-playsinline", "");
+          cleanPlayer.removeAttribute("data-lightbox-bound");
+          videoLightboxFrame.replaceChildren(cleanPlayer);
+          videoLightboxPlayerElement = cleanPlayer;
+        }
       }
       videoLightboxPlayer = null;
-      videoLightboxFrame?.replaceChildren();
     };
 
     const getMobileVideoAnchor = (host) => {
@@ -5689,7 +5719,7 @@
         });
     };
 
-    const createVideoLightboxPlayer = ({ title, videoUrl, poster }) => {
+    const createVideoLightboxPlayerLegacy = ({ title, videoUrl, poster }) => {
       if (!videoLightboxFrame || !videoUrl) return null;
       destroyVideoLightboxPlayer();
       const player = document.createElement("video");
@@ -5758,11 +5788,96 @@
       return player;
     };
 
+    const createVideoLightboxPlayer = ({ title, videoUrl, poster }) => {
+      if (!videoLightboxFrame || !videoUrl) return null;
+      destroyVideoLightboxPlayer();
+      const player = videoLightboxPlayerElement || videoLightboxFrame.querySelector("video");
+      if (!player) return null;
+      const currentToken = videoLightboxOpenToken + 1;
+      videoLightboxOpenToken = currentToken;
+
+      player.className = "video-lightbox-player";
+      player.controls = true;
+      player.playsInline = true;
+      player.autoplay = true;
+      player.preload = "auto";
+      player.muted = false;
+      player.volume = 1;
+      try { player.disablePictureInPicture = false; } catch (error) {}
+      try { player.disableRemotePlayback = false; } catch (error) {}
+      player.controlsList = "nodownload noplaybackrate";
+      player.setAttribute("playsinline", "");
+      player.setAttribute("webkit-playsinline", "");
+      player.setAttribute("x5-playsinline", "");
+      player.setAttribute("x5-video-player-type", "h5");
+      player.setAttribute("x5-video-player-fullscreen", "false");
+      player.setAttribute("x-webkit-airplay", "allow");
+      player.removeAttribute("disableRemotePlayback");
+      player.removeAttribute("poster");
+      if (poster) {
+        try { player.setAttribute("poster", poster); } catch (error) {}
+      }
+
+      player.dataset.originalVideoUrl = videoUrl;
+      player.dataset.currentVideoTitle = title || "视频作品";
+      player.dataset.videoPoster = poster || "";
+      player.src = getFreshVideoUrl(videoUrl);
+
+      if (player.dataset.lightboxBound !== "true") {
+        player.dataset.lightboxBound = "true";
+        player.addEventListener("loadedmetadata", () => {
+          if (videoLightboxPlayer !== player) return;
+          clearVideoPoster(player);
+          setVideoLightboxStatus("视频已准备好，正在播放。");
+        });
+        player.addEventListener("loadeddata", () => {
+          if (videoLightboxPlayer !== player) return;
+          clearVideoPoster(player);
+          setVideoLightboxStatus("正在播放。");
+        });
+        player.addEventListener("canplay", () => {
+          if (videoLightboxPlayer !== player) return;
+          clearVideoPoster(player);
+        });
+        player.addEventListener("waiting", () => {
+          if (videoLightboxPlayer !== player) return;
+          setVideoLightboxStatus("视频正在缓冲。文件较大时，手机端可能需要多等待一会儿。");
+        });
+        player.addEventListener("play", () => {
+          if (videoLightboxPlayer !== player) return;
+          clearVideoPoster(player);
+        });
+        player.addEventListener("playing", () => {
+          if (videoLightboxPlayer !== player) return;
+          clearVideoPoster(player);
+          setVideoLightboxStatus("正在播放。");
+          window.setTimeout(() => {
+            checkVideoFrameVisibility(player);
+          }, 1600);
+        });
+        player.addEventListener("timeupdate", () => {
+          if (videoLightboxPlayer !== player) return;
+          if (player.currentTime > 0.2) clearVideoPoster(player);
+        });
+        player.addEventListener("error", () => {
+          if (videoLightboxPlayer !== player) return;
+          clearVideoPoster(player);
+          setVideoLightboxStatus("当前浏览器加载或解码视频失败。请刷新重试，或使用支持 H.264 MP4 的浏览器打开。");
+        });
+      }
+
+      videoLightboxPlayer = player;
+      player.hidden = false;
+      player.load();
+      return player;
+    };
+
     const openVideoLightbox = ({ title, videoUrl, poster }) => {
       if (!videoLightbox || !videoUrl) return;
       if (videoLightboxTitle) videoLightboxTitle.textContent = title || "视频作品";
       setVideoLightboxStatus("视频正在准备播放。移动网络下大文件可能需要等待，请保持页面打开。");
       const player = createVideoLightboxPlayer({ title, videoUrl, poster });
+      videoLightbox.hidden = false;
       videoLightbox.classList.add("is-open");
       videoLightbox.setAttribute("aria-hidden", "false");
       document.body.classList.add("modal-open");
@@ -5775,6 +5890,7 @@
       if (!videoLightbox) return;
       videoLightbox.classList.remove("is-open");
       videoLightbox.setAttribute("aria-hidden", "true");
+      videoLightbox.hidden = true;
       document.body.classList.remove("modal-open");
       document.body.classList.remove("video-modal-open");
       destroyVideoLightboxPlayer();
@@ -5813,6 +5929,10 @@
       if (event.key === "Escape") closeVideoLightbox();
     });
     window.addEventListener("pagehide", () => {
+      if (videoLightbox?.classList.contains("is-open")) {
+        closeVideoLightbox();
+        return;
+      }
       if (shouldUseInlineVideo() && hasInlineVideoSurface()) {
         markInlineVideoNativeMode();
         refreshInlineVideoChrome();
@@ -5824,6 +5944,10 @@
     window.addEventListener("beforeunload", stopAllPageMedia);
     document.addEventListener("visibilitychange", () => {
       if (document.hidden) {
+        if (videoLightbox?.classList.contains("is-open")) {
+          closeVideoLightbox();
+          return;
+        }
         if (shouldUseInlineVideo() && hasInlineVideoSurface()) {
           markInlineVideoNativeMode();
           refreshInlineVideoChrome();
