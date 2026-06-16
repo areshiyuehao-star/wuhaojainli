@@ -2718,6 +2718,14 @@
       background: #000;
     }
 
+    .video-lightbox-player::-webkit-media-controls-fullscreen-button,
+    .video-lightbox-player::-webkit-media-controls-picture-in-picture-button,
+    .video-lightbox-player::-webkit-media-controls-toggle-closed-captions-button {
+      display: none !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+
     .inline-video-shell,
     .mobile-video-stage {
       position: relative;
@@ -5223,19 +5231,7 @@
     };
 
     const shouldUseInlineVideo = () => {
-      const width = Math.min(
-        window.innerWidth || document.documentElement.clientWidth || 9999,
-        window.screen?.width || 9999
-      );
-      const ua = navigator.userAgent || "";
-      const isMobileUA = /Android|iPhone|iPad|iPod|Mobile|MQQBrowser|QQBrowser|Quark|UCBrowser|MicroMessenger/i.test(ua);
-      return (
-        width <= 820 ||
-        window.matchMedia("(max-width: 820px)").matches ||
-        window.matchMedia("(pointer: coarse)").matches ||
-        navigator.maxTouchPoints > 0 ||
-        isMobileUA
-      );
+      return false;
     };
 
     const hasInlineVideoSurface = () => Boolean(
@@ -5703,13 +5699,15 @@
       player.autoplay = true;
       player.preload = "auto";
       player.disablePictureInPicture = true;
-      player.controlsList = "nodownload noplaybackrate noremoteplayback";
+      try { player.disableRemotePlayback = true; } catch (error) {}
+      player.controlsList = "nodownload nofullscreen noplaybackrate noremoteplayback";
       player.setAttribute("playsinline", "");
       player.setAttribute("webkit-playsinline", "");
       player.setAttribute("x5-playsinline", "");
       player.setAttribute("x5-video-player-type", "h5");
       player.setAttribute("x5-video-player-fullscreen", "false");
       player.setAttribute("x-webkit-airplay", "deny");
+      player.setAttribute("disableRemotePlayback", "");
       player.dataset.originalVideoUrl = videoUrl;
       player.dataset.currentVideoTitle = title || "视频作品";
       player.src = getFreshVideoUrl(videoUrl);
@@ -5742,6 +5740,17 @@
       player.addEventListener("error", () => {
         clearVideoPoster(player);
         setVideoLightboxStatus("当前浏览器加载或解码视频失败。请刷新重试，或使用支持 H.264 MP4 的浏览器打开。");
+      });
+      const preventMobileNativeTakeover = () => {
+        if (window.innerWidth > 820) return;
+        window.setTimeout(() => {
+          try { player.webkitExitFullscreen?.(); } catch (error) {}
+          try { document.exitFullscreen?.(); } catch (error) {}
+          try { document.webkitExitFullscreen?.(); } catch (error) {}
+        }, 0);
+      };
+      ["webkitbeginfullscreen", "enterpictureinpicture", "x5videoenterfullscreen"].forEach((eventName) => {
+        player.addEventListener(eventName, preventMobileNativeTakeover);
       });
       videoLightboxFrame.appendChild(player);
       videoLightboxPlayer = player;
