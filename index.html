@@ -2722,14 +2722,6 @@
       background: #000;
     }
 
-    .video-lightbox-player::-webkit-media-controls-fullscreen-button,
-    .video-lightbox-player::-webkit-media-controls-picture-in-picture-button,
-    .video-lightbox-player::-webkit-media-controls-toggle-closed-captions-button {
-      display: none !important;
-      opacity: 0 !important;
-      pointer-events: none !important;
-    }
-
     .inline-video-shell,
     .mobile-video-stage {
       position: relative;
@@ -5059,16 +5051,12 @@
   <div class="video-lightbox" id="video-lightbox" aria-hidden="true" role="dialog" aria-label="视频播放窗口" hidden>
     <button class="video-lightbox-close" id="video-lightbox-close" type="button" aria-label="关闭视频">×</button>
     <div class="video-lightbox-panel">
-      <div class="video-lightbox-toolbar">
-        <button class="video-lightbox-action" type="button" data-video-close>关闭视频</button>
-      </div>
       <div class="video-lightbox-frame" id="video-lightbox-frame">
         <video class="video-lightbox-player" id="video-lightbox-player" controls playsinline webkit-playsinline preload="metadata" hidden></video>
       </div>
       <div class="video-lightbox-meta">
         <h3 class="video-lightbox-title" id="video-lightbox-title">视频作品</h3>
         <p class="video-lightbox-status" id="video-lightbox-status">视频正在准备播放。移动网络下大文件可能需要等待，请保持页面打开。</p>
-        <button class="video-lightbox-action" type="button" data-video-close>关闭视频并返回作品集</button>
       </div>
     </div>
   </div>
@@ -5808,9 +5796,10 @@
       player.controlsList = "nodownload noplaybackrate";
       player.setAttribute("playsinline", "");
       player.setAttribute("webkit-playsinline", "");
-      player.setAttribute("x5-playsinline", "");
-      player.setAttribute("x5-video-player-type", "h5");
-      player.setAttribute("x5-video-player-fullscreen", "false");
+      player.removeAttribute("x5-playsinline");
+      player.removeAttribute("x5-video-player-type");
+      player.removeAttribute("x5-video-player-fullscreen");
+      player.removeAttribute("x5-video-orientation");
       player.setAttribute("x-webkit-airplay", "allow");
       player.removeAttribute("disableRemotePlayback");
       player.removeAttribute("poster");
@@ -5898,6 +5887,19 @@
       setVideoLightboxStatus("视频正在准备播放。移动网络下大文件可能需要等待，请保持页面打开。");
     };
 
+    const restoreVideoLightboxSurface = () => {
+      if (!videoLightbox || !videoLightboxPlayer) return;
+      videoLightbox.hidden = false;
+      videoLightbox.classList.add("is-open");
+      videoLightbox.setAttribute("aria-hidden", "false");
+      document.body.classList.add("modal-open");
+      document.body.classList.add("video-modal-open");
+      videoLightboxPlayer.hidden = false;
+      if (videoLightboxFrame && videoLightboxPlayer.parentElement !== videoLightboxFrame) {
+        videoLightboxFrame.replaceChildren(videoLightboxPlayer);
+      }
+    };
+
     const handleVideoCloseRequest = (event) => {
       const target = event.target?.closest?.("[data-video-close], #video-lightbox-close");
       if (!target) return;
@@ -5930,7 +5932,6 @@
     });
     window.addEventListener("pagehide", () => {
       if (videoLightbox?.classList.contains("is-open")) {
-        closeVideoLightbox();
         return;
       }
       if (shouldUseInlineVideo() && hasInlineVideoSurface()) {
@@ -5945,7 +5946,6 @@
     document.addEventListener("visibilitychange", () => {
       if (document.hidden) {
         if (videoLightbox?.classList.contains("is-open")) {
-          closeVideoLightbox();
           return;
         }
         if (shouldUseInlineVideo() && hasInlineVideoSurface()) {
@@ -5956,6 +5956,9 @@
         closeInlineVideo({ fromHistory: true });
         stopAllPageMedia();
         return;
+      }
+      if (videoLightboxPlayer) {
+        window.setTimeout(restoreVideoLightboxSurface, 80);
       }
       if (inlineVideoWasHidden || hasInlineVideoSurface()) {
         window.setTimeout(() => {
@@ -5984,12 +5987,15 @@
     });
     ["fullscreenchange", "webkitfullscreenchange", "mozfullscreenchange", "MSFullscreenChange"].forEach((eventName) => {
       document.addEventListener(eventName, () => {
-        if (!shouldUseInlineVideo()) return;
         window.setTimeout(() => {
           const fullscreenElement = document.fullscreenElement
             || document.webkitFullscreenElement
             || document.mozFullScreenElement
             || document.msFullscreenElement;
+          if (!fullscreenElement && videoLightboxPlayer) {
+            restoreVideoLightboxSurface();
+          }
+          if (!shouldUseInlineVideo()) return;
           if (!fullscreenElement && hasInlineVideoSurface()) {
             restoreInlineVideoSurface("已返回网页内部播放器，可继续播放或关闭。");
           }
@@ -5997,16 +6003,22 @@
       });
     });
     window.addEventListener("pageshow", () => {
-      if (!shouldUseInlineVideo() || !hasInlineVideoSurface()) return;
       window.setTimeout(() => {
+        if (document.visibilityState === "visible" && videoLightboxPlayer) {
+          restoreVideoLightboxSurface();
+        }
+        if (!shouldUseInlineVideo() || !hasInlineVideoSurface()) return;
         if (document.visibilityState === "visible" && hasInlineVideoSurface()) {
           restoreInlineVideoSurface("已恢复网页播放器，可继续播放或关闭。");
         }
       }, 120);
     });
     window.addEventListener("focus", () => {
-      if (!shouldUseInlineVideo() || !hasInlineVideoSurface()) return;
       window.setTimeout(() => {
+        if (document.visibilityState === "visible" && videoLightboxPlayer) {
+          restoreVideoLightboxSurface();
+        }
+        if (!shouldUseInlineVideo() || !hasInlineVideoSurface()) return;
         if (document.visibilityState === "visible" && hasInlineVideoSurface()) {
           restoreInlineVideoSurface("已恢复网页播放器，可继续播放或关闭。");
         }
