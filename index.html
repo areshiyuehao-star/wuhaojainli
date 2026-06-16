@@ -5096,6 +5096,8 @@
     let inlineVideoHost = null;
     let lastInlineVideoCloseAt = 0;
     let inlineVideoHistoryArmed = false;
+    let inlineVideoWasHidden = false;
+    let lastInlineVideoNativeModeAt = 0;
     let suppressNextInlineVideoPopstate = false;
 
     const getGalleryImage = (item) => item?.querySelector(".gallery-art img");
@@ -5217,6 +5219,24 @@
       document.querySelector(".mobile-video-stage video, .inline-video-shell video")
     );
 
+    const refreshInlineVideoChrome = () => {
+      if (!inlineVideoShell || !inlineVideoPlayer) return;
+      try { inlineVideoPlayer.controls = false; } catch (error) {}
+      try { inlineVideoPlayer.removeAttribute("controls"); } catch (error) {}
+      try { inlineVideoPlayer.setAttribute("playsinline", ""); } catch (error) {}
+      try { inlineVideoPlayer.setAttribute("webkit-playsinline", ""); } catch (error) {}
+      inlineVideoShell.classList.toggle("is-paused", inlineVideoPlayer.paused);
+      inlineVideoShell.classList.toggle("is-playing", !inlineVideoPlayer.paused);
+      const playToggle = inlineVideoShell.querySelector(".mobile-video-play-toggle");
+      if (playToggle) playToggle.textContent = inlineVideoPlayer.paused ? "播放视频" : "暂停视频";
+    };
+
+    const markInlineVideoNativeMode = () => {
+      if (!shouldUseInlineVideo() || !hasInlineVideoSurface()) return;
+      inlineVideoWasHidden = true;
+      lastInlineVideoNativeModeAt = Date.now();
+    };
+
     const armInlineVideoHistory = () => {
       if (!shouldUseInlineVideo() || inlineVideoHistoryArmed) return;
       try {
@@ -5279,6 +5299,7 @@
     const closeInlineVideo = ({ fromHistory = false, keepHistory = false } = {}) => {
       const hadInlineVideo = Boolean(inlineVideoShell || inlineVideoPlayer || inlineVideoHost);
       if (hadInlineVideo) lastInlineVideoCloseAt = Date.now();
+      inlineVideoWasHidden = false;
       if (inlineVideoPlayer) {
         hardStopMediaElement(inlineVideoPlayer);
       }
@@ -5328,9 +5349,11 @@
         document.body.appendChild(inlineVideoShell);
       }
       document.body.classList.add("mobile-video-open");
+      refreshInlineVideoChrome();
       const status = inlineVideoShell.querySelector(".inline-video-status");
       if (status) status.textContent = message;
       inlineVideoShell.classList.add("show-video-hint");
+      inlineVideoWasHidden = false;
       window.setTimeout(() => inlineVideoShell?.classList.remove("show-video-hint"), 700);
     };
 
@@ -5445,6 +5468,7 @@
       });
       const handleNativeVideoTakeover = () => {
         if (!shouldUseInlineVideo()) return;
+        markInlineVideoNativeMode();
         window.setTimeout(() => {
           try { player.controls = false; } catch (error) {}
           try { player.removeAttribute("controls"); } catch (error) {}
@@ -5703,14 +5727,32 @@
       if (event.key === "Escape") closeVideoLightbox();
     });
     window.addEventListener("pagehide", () => {
+      if (shouldUseInlineVideo() && hasInlineVideoSurface()) {
+        markInlineVideoNativeMode();
+        refreshInlineVideoChrome();
+        return;
+      }
       closeInlineVideo({ fromHistory: true });
       stopAllPageMedia();
     });
     window.addEventListener("beforeunload", stopAllPageMedia);
     document.addEventListener("visibilitychange", () => {
       if (document.hidden) {
+        if (shouldUseInlineVideo() && hasInlineVideoSurface()) {
+          markInlineVideoNativeMode();
+          refreshInlineVideoChrome();
+          return;
+        }
         closeInlineVideo({ fromHistory: true });
         stopAllPageMedia();
+        return;
+      }
+      if (inlineVideoWasHidden || hasInlineVideoSurface()) {
+        window.setTimeout(() => {
+          if (document.visibilityState === "visible" && hasInlineVideoSurface()) {
+            restoreInlineVideoSurface("已返回网页播放器，进度已保留，可继续播放或关闭。");
+          }
+        }, 80);
       }
     });
     window.addEventListener("popstate", () => {
@@ -5719,6 +5761,15 @@
         return;
       }
       if (!inlineVideoHistoryArmed && !hasInlineVideoSurface()) return;
+      if (
+        shouldUseInlineVideo() &&
+        hasInlineVideoSurface() &&
+        (inlineVideoWasHidden || Date.now() - lastInlineVideoNativeModeAt < 2500)
+      ) {
+        inlineVideoHistoryArmed = false;
+        restoreInlineVideoSurface("已回到网页播放器，视频没有被隐藏。");
+        return;
+      }
       forceCloseMobilePlayback({ fromHistory: true });
     });
     ["fullscreenchange", "webkitfullscreenchange", "mozfullscreenchange", "MSFullscreenChange"].forEach((eventName) => {
