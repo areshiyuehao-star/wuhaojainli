@@ -4962,6 +4962,8 @@
     let inlineVideoPlayer = null;
     let inlineVideoHost = null;
     let lastInlineVideoCloseAt = 0;
+    let inlineVideoHistoryArmed = false;
+    let suppressNextInlineVideoPopstate = false;
 
     const getGalleryImage = (item) => item?.querySelector(".gallery-art img");
     let imageLightboxItems = [];
@@ -5065,6 +5067,20 @@
       window.matchMedia("(pointer: coarse)").matches
     );
 
+    const hasInlineVideoSurface = () => Boolean(
+      inlineVideoPlayer ||
+      inlineVideoShell ||
+      document.querySelector(".mobile-video-stage video, .inline-video-shell video")
+    );
+
+    const armInlineVideoHistory = () => {
+      if (!shouldUseInlineVideo() || inlineVideoHistoryArmed) return;
+      try {
+        window.history.pushState({ ...(window.history.state || {}), wuhaoInlineVideo: true }, "", window.location.href);
+        inlineVideoHistoryArmed = true;
+      } catch (error) {}
+    };
+
     const stopMediaElement = (media) => {
       if (!media) return;
       try { media.pause(); } catch (error) {}
@@ -5116,7 +5132,7 @@
       mediaElements.forEach(stopMediaElement);
     };
 
-    const closeInlineVideo = () => {
+    const closeInlineVideo = ({ fromHistory = false, keepHistory = false } = {}) => {
       const hadInlineVideo = Boolean(inlineVideoShell || inlineVideoPlayer || inlineVideoHost);
       if (hadInlineVideo) lastInlineVideoCloseAt = Date.now();
       if (inlineVideoPlayer) {
@@ -5135,6 +5151,13 @@
       inlineVideoShell = null;
       inlineVideoPlayer = null;
       inlineVideoHost = null;
+      if (hadInlineVideo && inlineVideoHistoryArmed && !fromHistory && !keepHistory) {
+        inlineVideoHistoryArmed = false;
+        suppressNextInlineVideoPopstate = true;
+        try { window.history.back(); } catch (error) {}
+      } else if (fromHistory) {
+        inlineVideoHistoryArmed = false;
+      }
       if (hadInlineVideo) {
         [120, 360, 900].forEach((delay) => {
           window.setTimeout(() => {
@@ -5143,6 +5166,14 @@
           }, delay);
         });
       }
+    };
+
+    const forceCloseMobilePlayback = ({ fromHistory = false } = {}) => {
+      if (!shouldUseInlineVideo()) return;
+      if (hasInlineVideoSurface()) {
+        closeInlineVideo({ fromHistory });
+      }
+      stopAllPageMedia();
     };
 
     const destroyVideoLightboxPlayer = () => {
@@ -5171,7 +5202,8 @@
       if (!host || !videoUrl) return null;
       if (Date.now() - lastInlineVideoCloseAt < 700) return null;
       closeVideoLightbox();
-      closeInlineVideo();
+      closeInlineVideo({ keepHistory: true });
+      armInlineVideoHistory();
       const anchor = getMobileVideoAnchor(host);
       const shell = document.createElement("div");
       shell.className = "mobile-video-stage";
@@ -5241,6 +5273,21 @@
       });
       player.addEventListener("error", () => {
         if (status) status.textContent = "当前浏览器加载视频失败，请刷新后重试。";
+      });
+      const handleNativeVideoTakeover = () => {
+        if (!shouldUseInlineVideo()) return;
+        if (status) status.textContent = "已退出浏览器全屏播放，避免隐藏声音残留。";
+        window.setTimeout(() => forceCloseMobilePlayback(), 0);
+      };
+      [
+        "webkitbeginfullscreen",
+        "webkitendfullscreen",
+        "x5videoenterfullscreen",
+        "x5videoexitfullscreen",
+        "enterpictureinpicture",
+        "leavepictureinpicture"
+      ].forEach((eventName) => {
+        player.addEventListener(eventName, handleNativeVideoTakeover);
       });
       const playInlineVideo = () => {
         clearVideoPoster(player);
@@ -5448,15 +5495,53 @@
       if (event.key === "Escape") closeVideoLightbox();
     });
     window.addEventListener("pagehide", () => {
-      closeInlineVideo();
+      closeInlineVideo({ fromHistory: true });
       stopAllPageMedia();
     });
     window.addEventListener("beforeunload", stopAllPageMedia);
     document.addEventListener("visibilitychange", () => {
       if (document.hidden) {
-        closeInlineVideo();
+        closeInlineVideo({ fromHistory: true });
         stopAllPageMedia();
       }
+    });
+    window.addEventListener("popstate", () => {
+      if (suppressNextInlineVideoPopstate) {
+        suppressNextInlineVideoPopstate = false;
+        return;
+      }
+      if (!inlineVideoHistoryArmed && !hasInlineVideoSurface()) return;
+      forceCloseMobilePlayback({ fromHistory: true });
+    });
+    ["fullscreenchange", "webkitfullscreenchange", "mozfullscreenchange", "MSFullscreenChange"].forEach((eventName) => {
+      document.addEventListener(eventName, () => {
+        if (!shouldUseInlineVideo()) return;
+        window.setTimeout(() => {
+          const fullscreenElement = document.fullscreenElement
+            || document.webkitFullscreenElement
+            || document.mozFullScreenElement
+            || document.msFullscreenElement;
+          if (!fullscreenElement && hasInlineVideoSurface()) {
+            forceCloseMobilePlayback();
+          }
+        }, 80);
+      });
+    });
+    window.addEventListener("pageshow", () => {
+      if (!shouldUseInlineVideo() || !hasInlineVideoSurface()) return;
+      window.setTimeout(() => {
+        if (document.visibilityState === "visible" && hasInlineVideoSurface()) {
+          forceCloseMobilePlayback();
+        }
+      }, 120);
+    });
+    window.addEventListener("focus", () => {
+      if (!shouldUseInlineVideo() || !hasInlineVideoSurface()) return;
+      window.setTimeout(() => {
+        if (document.visibilityState === "visible" && hasInlineVideoSurface()) {
+          forceCloseMobilePlayback();
+        }
+      }, 180);
     });
 
     const showreelCard = document.querySelector("#showreel .showreel");
