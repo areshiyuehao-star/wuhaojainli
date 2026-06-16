@@ -2710,7 +2710,7 @@
       position: relative;
       z-index: 20;
       display: grid;
-      grid-template-rows: auto minmax(220px, 1fr) auto;
+      grid-template-rows: auto minmax(220px, 1fr) auto auto;
       gap: 8px;
       width: 100%;
       min-height: min(68vh, 620px);
@@ -2727,6 +2727,11 @@
     .mobile-video-stage {
       max-width: min(100%, 960px);
       margin-inline: auto;
+    }
+
+    .mobile-video-stage .work-video {
+      pointer-events: none;
+      -webkit-touch-callout: none;
     }
 
     .inline-video-toolbar,
@@ -2773,6 +2778,34 @@
       cursor: pointer;
       pointer-events: auto;
       touch-action: manipulation;
+    }
+
+    .mobile-video-controls {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      padding-top: 2px;
+      pointer-events: auto;
+    }
+
+    .mobile-video-play-toggle,
+    .mobile-video-replay {
+      min-height: 42px;
+      padding: 0 18px;
+      border: 1px solid rgba(0,229,255,0.58);
+      border-radius: 999px;
+      color: #001216;
+      background: var(--accent);
+      font: 800 14px/1 "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+      cursor: pointer;
+      touch-action: manipulation;
+      box-shadow: 0 0 22px rgba(0,229,255,0.18);
+    }
+
+    .mobile-video-replay {
+      color: var(--accent);
+      background: rgba(14,14,14,0.9);
     }
 
     .inline-video-status {
@@ -5035,8 +5068,12 @@
     const stopMediaElement = (media) => {
       if (!media) return;
       try { media.pause(); } catch (error) {}
+      try { media.controls = false; } catch (error) {}
       try { media.muted = true; } catch (error) {}
+      try { media.volume = 0; } catch (error) {}
       try { media.currentTime = 0; } catch (error) {}
+      try { media.webkitExitFullscreen?.(); } catch (error) {}
+      try { media.exitFullscreen?.(); } catch (error) {}
       try { media.removeAttribute("src"); } catch (error) {}
       try { media.src = ""; } catch (error) {}
       try { media.srcObject = null; } catch (error) {}
@@ -5047,6 +5084,14 @@
         });
       } catch (error) {}
       try { media.load(); } catch (error) {}
+    };
+
+    const hardStopMediaElement = (media) => {
+      if (!media) return;
+      stopMediaElement(media);
+      [80, 240, 560].forEach((delay) => {
+        window.setTimeout(() => stopMediaElement(media), delay);
+      });
     };
 
     const exitNativeVideoModes = () => {
@@ -5075,17 +5120,29 @@
       const hadInlineVideo = Boolean(inlineVideoShell || inlineVideoPlayer || inlineVideoHost);
       if (hadInlineVideo) lastInlineVideoCloseAt = Date.now();
       if (inlineVideoPlayer) {
-        stopMediaElement(inlineVideoPlayer);
+        hardStopMediaElement(inlineVideoPlayer);
       }
+      document.querySelectorAll(".mobile-video-stage video, .inline-video-shell video").forEach(hardStopMediaElement);
       if (inlineVideoHost) {
         inlineVideoHost.classList.remove("inline-video-active");
       }
       if (inlineVideoShell) {
         try { inlineVideoShell.remove(); } catch (error) {}
       }
+      document.querySelectorAll(".mobile-video-stage, .inline-video-shell").forEach((stage) => {
+        try { stage.remove(); } catch (error) {}
+      });
       inlineVideoShell = null;
       inlineVideoPlayer = null;
       inlineVideoHost = null;
+      if (hadInlineVideo) {
+        [120, 360, 900].forEach((delay) => {
+          window.setTimeout(() => {
+            exitNativeVideoModes();
+            document.querySelectorAll("video, audio").forEach(stopMediaElement);
+          }, delay);
+        });
+      }
     };
 
     const destroyVideoLightboxPlayer = () => {
@@ -5128,19 +5185,34 @@
           </div>
           <button class="inline-video-close" type="button">关闭视频</button>
         </div>
-        <video class="work-video" controls playsinline webkit-playsinline preload="metadata"></video>
+        <video class="work-video mobile-video-element" playsinline webkit-playsinline preload="metadata"></video>
+        <div class="mobile-video-controls">
+          <button class="mobile-video-play-toggle" type="button">播放视频</button>
+          <button class="mobile-video-replay" type="button">重新播放</button>
+        </div>
         <p class="inline-video-status">视频正在准备播放。</p>
       `;
       const player = shell.querySelector("video");
       const status = shell.querySelector(".inline-video-status");
       const closeButton = shell.querySelector(".inline-video-close");
+      const playToggle = shell.querySelector(".mobile-video-play-toggle");
+      const replayButton = shell.querySelector(".mobile-video-replay");
       const titleNode = shell.querySelector(".mobile-video-stage-title strong");
       if (titleNode) titleNode.textContent = title || "视频作品";
-      player.controls = true;
+      const updateInlinePlayState = () => {
+        if (!playToggle) return;
+        playToggle.textContent = player.paused ? "播放视频" : "暂停视频";
+      };
+      player.controls = false;
       player.playsInline = true;
-      player.autoplay = true;
+      player.autoplay = false;
       player.disablePictureInPicture = true;
       player.controlsList = "nodownload noplaybackrate noremoteplayback";
+      player.setAttribute("playsinline", "");
+      player.setAttribute("webkit-playsinline", "");
+      player.setAttribute("x5-playsinline", "");
+      player.setAttribute("x5-video-player-type", "h5");
+      player.setAttribute("x5-video-player-fullscreen", "false");
       player.setAttribute("aria-label", title || "视频作品");
       player.setAttribute("x-webkit-airplay", "deny");
       player.dataset.currentVideoTitle = title || "视频作品";
@@ -5149,13 +5221,20 @@
       player.addEventListener("loadedmetadata", () => {
         clearVideoPoster(player);
         if (status) status.textContent = "视频已准备好。";
+        updateInlinePlayState();
       });
       player.addEventListener("playing", () => {
         clearVideoPoster(player);
         if (status) status.textContent = "正在播放。";
+        updateInlinePlayState();
       });
       player.addEventListener("pause", () => {
         if (status && inlineVideoPlayer === player) status.textContent = "已暂停，可继续播放或关闭。";
+        updateInlinePlayState();
+      });
+      player.addEventListener("ended", () => {
+        if (status && inlineVideoPlayer === player) status.textContent = "播放完成。";
+        updateInlinePlayState();
       });
       player.addEventListener("waiting", () => {
         if (status) status.textContent = "视频正在缓冲，请稍等。";
@@ -5163,6 +5242,36 @@
       player.addEventListener("error", () => {
         if (status) status.textContent = "当前浏览器加载视频失败，请刷新后重试。";
       });
+      const playInlineVideo = () => {
+        clearVideoPoster(player);
+        try { player.muted = false; } catch (error) {}
+        try { player.volume = 1; } catch (error) {}
+        const promise = player.play?.();
+        if (promise && typeof promise.catch === "function") {
+          promise.catch(() => {
+            if (status) status.textContent = "浏览器阻止了自动播放，请点击播放视频。";
+            updateInlinePlayState();
+          });
+        }
+      };
+      const toggleInlineVideo = (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        if (player.paused) {
+          playInlineVideo();
+        } else {
+          player.pause();
+        }
+        updateInlinePlayState();
+      };
+      const replayInlineVideo = (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        try { player.currentTime = 0; } catch (error) {}
+        playInlineVideo();
+      };
+      playToggle?.addEventListener("click", toggleInlineVideo);
+      replayButton?.addEventListener("click", replayInlineVideo);
       const requestInlineClose = (event) => {
         event.preventDefault();
         event.stopPropagation();
@@ -5186,9 +5295,7 @@
       inlineVideoPlayer = player;
       inlineVideoHost = host;
       player.load();
-      player.play?.().catch(() => {
-        if (status) status.textContent = "请点击播放器播放。";
-      });
+      playInlineVideo();
       shell.scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" });
       return player;
     };
