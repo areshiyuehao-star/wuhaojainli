@@ -2705,14 +2705,16 @@
       background: #000;
     }
 
-    .inline-video-shell {
+    .inline-video-shell,
+    .mobile-video-stage {
       position: relative;
       z-index: 20;
       display: grid;
       grid-template-rows: auto minmax(220px, 1fr) auto;
       gap: 8px;
       width: 100%;
-      min-height: min(72vh, 620px);
+      min-height: min(68vh, 620px);
+      margin: 18px 0 28px;
       padding: 10px;
       background: #000;
       border: 1px solid rgba(0,229,255,0.52);
@@ -2722,22 +2724,46 @@
       pointer-events: auto;
     }
 
-    .work-card .inline-video-shell {
-      min-height: min(78vh, 560px);
-      scroll-snap-align: start;
+    .mobile-video-stage {
+      max-width: min(100%, 960px);
+      margin-inline: auto;
     }
 
-    .inline-video-toolbar {
+    .inline-video-toolbar,
+    .mobile-video-stage-head {
       display: flex;
-      justify-content: flex-end;
+      justify-content: space-between;
+      align-items: center;
       gap: 8px;
       pointer-events: auto;
+    }
+
+    .mobile-video-stage-title {
+      display: grid;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .mobile-video-stage-title span {
+      color: var(--accent);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .mobile-video-stage-title strong {
+      color: var(--cream);
+      font-size: 16px;
+      line-height: 1.25;
+      overflow-wrap: anywhere;
     }
 
     .inline-video-close {
       position: relative;
       z-index: 22;
       min-height: 38px;
+      flex: 0 0 auto;
       padding: 0 14px;
       border: 1px solid rgba(0,229,255,0.58);
       border-radius: 999px;
@@ -2758,7 +2784,8 @@
     }
 
     .inline-video-active {
-      display: none !important;
+      outline: 1px solid rgba(0,229,255,0.42);
+      outline-offset: 4px;
     }
 
     .video-lightbox-meta {
@@ -5046,6 +5073,7 @@
 
     const closeInlineVideo = () => {
       const hadInlineVideo = Boolean(inlineVideoShell || inlineVideoPlayer || inlineVideoHost);
+      if (hadInlineVideo) lastInlineVideoCloseAt = Date.now();
       if (inlineVideoPlayer) {
         stopMediaElement(inlineVideoPlayer);
       }
@@ -5058,7 +5086,6 @@
       inlineVideoShell = null;
       inlineVideoPlayer = null;
       inlineVideoHost = null;
-      if (hadInlineVideo) lastInlineVideoCloseAt = Date.now();
     };
 
     const destroyVideoLightboxPlayer = () => {
@@ -5071,22 +5098,44 @@
       videoLightboxFrame?.replaceChildren();
     };
 
+    const getMobileVideoAnchor = (host) => {
+      const worksSection = host?.closest?.("#works");
+      if (worksSection) {
+        return worksSection.querySelector(".section-head") || worksSection;
+      }
+      const showreelSection = host?.closest?.("#showreel");
+      if (showreelSection) {
+        return showreelSection.querySelector(".showreel") || showreelSection;
+      }
+      return host;
+    };
+
     const createInlineVideoPlayer = ({ host, title, videoUrl, poster }) => {
       if (!host || !videoUrl) return null;
+      if (Date.now() - lastInlineVideoCloseAt < 700) return null;
       closeVideoLightbox();
       closeInlineVideo();
+      const anchor = getMobileVideoAnchor(host);
       const shell = document.createElement("div");
-      shell.className = "inline-video-shell";
+      shell.className = "mobile-video-stage";
+      shell.setAttribute("role", "region");
+      shell.setAttribute("aria-label", title ? `${title} 播放器` : "视频播放器");
       shell.innerHTML = `
-        <div class="inline-video-toolbar">
+        <div class="mobile-video-stage-head">
+          <div class="mobile-video-stage-title">
+            <span>Now Playing</span>
+            <strong></strong>
+          </div>
           <button class="inline-video-close" type="button">关闭视频</button>
         </div>
-        <video class="work-video" controls playsinline webkit-playsinline x5-playsinline x5-video-player-type="h5" x5-video-player-fullscreen="false" preload="auto"></video>
+        <video class="work-video" controls playsinline webkit-playsinline preload="metadata"></video>
         <p class="inline-video-status">视频正在准备播放。</p>
       `;
       const player = shell.querySelector("video");
       const status = shell.querySelector(".inline-video-status");
       const closeButton = shell.querySelector(".inline-video-close");
+      const titleNode = shell.querySelector(".mobile-video-stage-title strong");
+      if (titleNode) titleNode.textContent = title || "视频作品";
       player.controls = true;
       player.playsInline = true;
       player.autoplay = true;
@@ -5131,7 +5180,7 @@
           event.stopPropagation();
         }, { passive: true });
       });
-      host.insertAdjacentElement("afterend", shell);
+      anchor?.insertAdjacentElement("afterend", shell);
       host.classList.add("inline-video-active");
       inlineVideoShell = shell;
       inlineVideoPlayer = player;
@@ -5295,6 +5344,7 @@
       closeInlineVideo();
       stopAllPageMedia();
     });
+    window.addEventListener("beforeunload", stopAllPageMedia);
     document.addEventListener("visibilitychange", () => {
       if (document.hidden) {
         closeInlineVideo();
@@ -6217,6 +6267,9 @@
     window.addEventListener("resize", () => {
       updateScrollProgress();
       resizeMotionCanvas();
+      if (!shouldUseInlineVideo() && inlineVideoShell) {
+        closeInlineVideo();
+      }
     }, { passive: true });
 
     menuButton.addEventListener("click", () => {
@@ -6227,6 +6280,7 @@
 
     nav.querySelectorAll("a").forEach((link) => {
       link.addEventListener("click", () => {
+        closeInlineVideo();
         nav.classList.remove("is-open");
         menuButton.setAttribute("aria-expanded", "false");
         menuButton.textContent = "☰";
