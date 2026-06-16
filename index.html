@@ -2738,12 +2738,14 @@
     }
 
     .mobile-video-stage {
-      position: fixed;
-      inset: 0;
-      z-index: 2147483200;
-      display: grid;
+      position: fixed !important;
+      inset: 0 !important;
+      z-index: 2147483647 !important;
+      display: grid !important;
       grid-template-rows: auto minmax(0, 1fr) auto auto;
-      width: 100vw;
+      width: 100vw !important;
+      height: 100vh;
+      height: 100dvh;
       min-height: 100vh;
       min-height: 100dvh;
       max-width: none;
@@ -2762,6 +2764,22 @@
       margin-inline: 0;
     }
 
+    .mobile-video-viewport {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      place-items: center;
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      overflow: hidden;
+      border: 1px solid rgba(0,229,255,0.34);
+      border-radius: 18px;
+      background: #000;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04), 0 0 36px rgba(0,229,255,0.14);
+      touch-action: manipulation;
+    }
+
     .mobile-video-stage .work-video {
       display: block;
       width: 100%;
@@ -2772,6 +2790,65 @@
       object-fit: contain;
       pointer-events: none;
       -webkit-touch-callout: none;
+    }
+
+    .mobile-video-stage .work-video::-webkit-media-controls,
+    .mobile-video-stage .work-video::-webkit-media-controls-enclosure,
+    .mobile-video-stage .work-video::-webkit-media-controls-panel,
+    .mobile-video-stage .work-video::-webkit-media-controls-play-button,
+    .mobile-video-stage .work-video::-webkit-media-controls-start-playback-button,
+    .mobile-video-stage .work-video::-webkit-media-controls-fullscreen-button,
+    .mobile-video-stage .work-video::-webkit-media-controls-timeline,
+    .mobile-video-stage .work-video::-webkit-media-controls-current-time-display,
+    .mobile-video-stage .work-video::-webkit-media-controls-time-remaining-display,
+    .mobile-video-stage .work-video::-webkit-media-controls-mute-button,
+    .mobile-video-stage .work-video::-webkit-media-controls-volume-slider {
+      display: none !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+
+    .mobile-video-native-shield {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      display: grid;
+      place-items: center;
+      border: 0;
+      padding: 0;
+      color: var(--accent);
+      background: transparent;
+      cursor: pointer;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .mobile-video-native-shield::before {
+      content: "暂停";
+      display: grid;
+      place-items: center;
+      width: 74px;
+      height: 74px;
+      border: 1px solid rgba(0,229,255,0.42);
+      border-radius: 50%;
+      color: rgba(246,243,238,0.86);
+      background: rgba(0,0,0,0.42);
+      font: 800 14px/1 "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+      opacity: 0;
+      transform: scale(0.92);
+      transition: opacity 160ms ease, transform 160ms ease;
+      pointer-events: none;
+    }
+
+    .mobile-video-stage.is-paused .mobile-video-native-shield::before {
+      content: "播放";
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .mobile-video-stage.show-video-hint .mobile-video-native-shield::before {
+      opacity: 1;
+      transform: scale(1);
     }
 
     .inline-video-toolbar,
@@ -2838,7 +2915,8 @@
     }
 
     .mobile-video-play-toggle,
-    .mobile-video-replay {
+    .mobile-video-replay,
+    .mobile-video-full-toggle {
       min-height: 42px;
       padding: 0 18px;
       border: 1px solid rgba(0,229,255,0.58);
@@ -2854,6 +2932,11 @@
     .mobile-video-replay {
       color: var(--accent);
       background: rgba(14,14,14,0.9);
+    }
+
+    .mobile-video-full-toggle {
+      color: var(--accent);
+      background: rgba(0,229,255,0.1);
     }
 
     .inline-video-status {
@@ -5112,10 +5195,21 @@
       return `${videoUrl}${separator}wuhao_play=${Date.now()}`;
     };
 
-    const shouldUseInlineVideo = () => (
-      window.matchMedia("(max-width: 820px)").matches ||
-      window.matchMedia("(pointer: coarse)").matches
-    );
+    const shouldUseInlineVideo = () => {
+      const width = Math.min(
+        window.innerWidth || document.documentElement.clientWidth || 9999,
+        window.screen?.width || 9999
+      );
+      const ua = navigator.userAgent || "";
+      const isMobileUA = /Android|iPhone|iPad|iPod|Mobile|MQQBrowser|QQBrowser|Quark|UCBrowser|MicroMessenger/i.test(ua);
+      return (
+        width <= 820 ||
+        window.matchMedia("(max-width: 820px)").matches ||
+        window.matchMedia("(pointer: coarse)").matches ||
+        navigator.maxTouchPoints > 0 ||
+        isMobileUA
+      );
+    };
 
     const hasInlineVideoSurface = () => Boolean(
       inlineVideoPlayer ||
@@ -5227,6 +5321,19 @@
       stopAllPageMedia();
     };
 
+    const restoreInlineVideoSurface = (message = "已返回网页播放器，可继续播放或关闭。") => {
+      if (!shouldUseInlineVideo() || !inlineVideoShell) return;
+      try { exitNativeVideoModes(); } catch (error) {}
+      if (!inlineVideoShell.isConnected) {
+        document.body.appendChild(inlineVideoShell);
+      }
+      document.body.classList.add("mobile-video-open");
+      const status = inlineVideoShell.querySelector(".inline-video-status");
+      if (status) status.textContent = message;
+      inlineVideoShell.classList.add("show-video-hint");
+      window.setTimeout(() => inlineVideoShell?.classList.remove("show-video-hint"), 700);
+    };
+
     const destroyVideoLightboxPlayer = () => {
       stopAllPageMedia();
       if (videoLightboxPlayer) {
@@ -5267,10 +5374,14 @@
           </div>
           <button class="inline-video-close" type="button">关闭视频</button>
         </div>
-        <video class="work-video mobile-video-element" playsinline webkit-playsinline preload="metadata"></video>
+        <div class="mobile-video-viewport">
+          <video class="work-video mobile-video-element" playsinline webkit-playsinline preload="metadata"></video>
+          <button class="mobile-video-native-shield" type="button" aria-label="播放或暂停视频"></button>
+        </div>
         <div class="mobile-video-controls">
           <button class="mobile-video-play-toggle" type="button">播放视频</button>
           <button class="mobile-video-replay" type="button">重新播放</button>
+          <button class="mobile-video-full-toggle" type="button">网页全屏</button>
         </div>
         <p class="inline-video-status">视频正在准备播放。</p>
       `;
@@ -5279,16 +5390,22 @@
       const closeButton = shell.querySelector(".inline-video-close");
       const playToggle = shell.querySelector(".mobile-video-play-toggle");
       const replayButton = shell.querySelector(".mobile-video-replay");
+      const fullToggle = shell.querySelector(".mobile-video-full-toggle");
+      const nativeShield = shell.querySelector(".mobile-video-native-shield");
       const titleNode = shell.querySelector(".mobile-video-stage-title strong");
       if (titleNode) titleNode.textContent = title || "视频作品";
       const updateInlinePlayState = () => {
         if (!playToggle) return;
         playToggle.textContent = player.paused ? "播放视频" : "暂停视频";
+        shell.classList.toggle("is-paused", player.paused);
+        shell.classList.toggle("is-playing", !player.paused);
       };
       player.controls = false;
+      player.removeAttribute("controls");
       player.playsInline = true;
       player.autoplay = false;
       player.disablePictureInPicture = true;
+      try { player.disableRemotePlayback = true; } catch (error) {}
       player.controlsList = "nodownload noplaybackrate noremoteplayback";
       player.setAttribute("playsinline", "");
       player.setAttribute("webkit-playsinline", "");
@@ -5296,6 +5413,7 @@
       player.setAttribute("x5-video-player-type", "h5");
       player.setAttribute("x5-video-player-fullscreen", "false");
       player.setAttribute("x5-video-orientation", "portrait");
+      player.setAttribute("disableRemotePlayback", "");
       player.setAttribute("aria-label", title || "视频作品");
       player.setAttribute("x-webkit-airplay", "deny");
       player.dataset.currentVideoTitle = title || "视频作品";
@@ -5327,8 +5445,13 @@
       });
       const handleNativeVideoTakeover = () => {
         if (!shouldUseInlineVideo()) return;
-        if (status) status.textContent = "已退出浏览器全屏播放，避免隐藏声音残留。";
-        window.setTimeout(() => forceCloseMobilePlayback(), 0);
+        window.setTimeout(() => {
+          try { player.controls = false; } catch (error) {}
+          try { player.removeAttribute("controls"); } catch (error) {}
+          try { player.webkitExitFullscreen?.(); } catch (error) {}
+          restoreInlineVideoSurface("已返回网页内部播放器，可继续播放或关闭。");
+          updateInlinePlayState();
+        }, 0);
       };
       [
         "webkitbeginfullscreen",
@@ -5342,6 +5465,8 @@
       });
       const playInlineVideo = () => {
         clearVideoPoster(player);
+        try { player.controls = false; } catch (error) {}
+        try { player.removeAttribute("controls"); } catch (error) {}
         try { player.muted = false; } catch (error) {}
         try { player.volume = 1; } catch (error) {}
         const promise = player.play?.();
@@ -5361,6 +5486,8 @@
           player.pause();
         }
         updateInlinePlayState();
+        shell.classList.add("show-video-hint");
+        window.setTimeout(() => shell.classList.remove("show-video-hint"), 520);
       };
       const replayInlineVideo = (event) => {
         event.preventDefault();
@@ -5369,7 +5496,31 @@
         playInlineVideo();
       };
       playToggle?.addEventListener("click", toggleInlineVideo);
+      let lastShieldToggleAt = 0;
+      const handleShieldToggle = (event) => {
+        const now = Date.now();
+        event.preventDefault();
+        event.stopPropagation();
+        if (now - lastShieldToggleAt < 420) return;
+        lastShieldToggleAt = now;
+        toggleInlineVideo(event);
+      };
+      ["click", "touchend", "pointerup"].forEach((eventName) => {
+        nativeShield?.addEventListener(eventName, handleShieldToggle, { passive: false });
+      });
+      ["touchstart", "pointerdown", "dblclick", "contextmenu"].forEach((eventName) => {
+        nativeShield?.addEventListener(eventName, (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+        }, { passive: false });
+      });
       replayButton?.addEventListener("click", replayInlineVideo);
+      fullToggle?.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        shell.classList.toggle("is-web-fullscreen");
+        fullToggle.textContent = shell.classList.contains("is-web-fullscreen") ? "退出全屏" : "网页全屏";
+      });
       ["click", "dblclick", "contextmenu", "touchstart", "touchend", "pointerdown", "pointerup"].forEach((eventName) => {
         player.addEventListener(eventName, (event) => {
           event.preventDefault();
@@ -5579,7 +5730,7 @@
             || document.mozFullScreenElement
             || document.msFullscreenElement;
           if (!fullscreenElement && hasInlineVideoSurface()) {
-            forceCloseMobilePlayback();
+            restoreInlineVideoSurface("已返回网页内部播放器，可继续播放或关闭。");
           }
         }, 80);
       });
@@ -5588,7 +5739,7 @@
       if (!shouldUseInlineVideo() || !hasInlineVideoSurface()) return;
       window.setTimeout(() => {
         if (document.visibilityState === "visible" && hasInlineVideoSurface()) {
-          forceCloseMobilePlayback();
+          restoreInlineVideoSurface("已恢复网页播放器，可继续播放或关闭。");
         }
       }, 120);
     });
@@ -5596,7 +5747,7 @@
       if (!shouldUseInlineVideo() || !hasInlineVideoSurface()) return;
       window.setTimeout(() => {
         if (document.visibilityState === "visible" && hasInlineVideoSurface()) {
-          forceCloseMobilePlayback();
+          restoreInlineVideoSurface("已恢复网页播放器，可继续播放或关闭。");
         }
       }, 180);
     });
