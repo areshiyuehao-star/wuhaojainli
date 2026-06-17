@@ -3025,13 +3025,27 @@
     @media (max-width: 720px) {
       .video-lightbox {
         align-items: start;
-        padding-top: max(18px, env(safe-area-inset-top));
+        justify-items: center;
+        grid-template-rows: auto minmax(0, 1fr);
+        padding-top: max(10px, env(safe-area-inset-top));
         padding-bottom: max(76px, env(safe-area-inset-bottom));
+      }
+
+      .video-lightbox-close {
+        position: relative;
+        top: auto;
+        right: auto;
+        justify-self: end;
+        margin: 0 max(4px, env(safe-area-inset-right)) 10px 0;
+        z-index: 2147483647;
+        background: rgba(0,0,0,0.92);
+        box-shadow: 0 10px 34px rgba(0,0,0,0.48), 0 0 24px rgba(0,229,255,0.2);
       }
 
       .video-lightbox-panel {
         width: min(100%, 96vw);
-        max-height: calc(100vh - max(94px, env(safe-area-inset-bottom)));
+        max-height: calc(100vh - max(122px, env(safe-area-inset-bottom)));
+        max-height: calc(100dvh - max(122px, env(safe-area-inset-bottom)));
       }
 
       .video-lightbox-toolbar {
@@ -4302,8 +4316,6 @@
       .video-lightbox-close {
         width: 48px;
         height: 48px;
-        top: max(12px, env(safe-area-inset-top));
-        right: max(12px, env(safe-area-inset-right));
       }
 
       .image-lightbox-nav {
@@ -4323,13 +4335,14 @@
       }
 
       .video-lightbox {
-        padding: max(12px, env(safe-area-inset-top)) 10px max(76px, env(safe-area-inset-bottom));
+        padding: max(10px, env(safe-area-inset-top)) 10px max(76px, env(safe-area-inset-bottom));
       }
 
       .video-lightbox-panel {
         width: 100%;
         gap: 10px;
-        max-height: calc(100vh - 18px);
+        max-height: calc(100vh - 88px);
+        max-height: calc(100dvh - 88px);
       }
 
       .video-lightbox-toolbar .video-lightbox-action {
