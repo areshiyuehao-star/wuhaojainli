@@ -4487,8 +4487,6 @@
         <a href="#contact" data-edit-id="editable-004" class="">联系</a>
       </nav>
       <div style="display:flex; gap:8px;">
-        <button class="edit-button" id="edit-toggle" type="button" aria-pressed="false" style="">编辑</button>
-        <button class="icon-button" id="theme-toggle" type="button" aria-label="切换明暗主题" style="">☼</button>
         <button class="icon-button menu-button" id="menu-toggle" type="button" aria-label="打开菜单" aria-controls="site-nav" aria-expanded="false">☰</button>
       </div>
     </div>
@@ -6476,9 +6474,9 @@
     const setEditMode = (enabled) => {
       editMode = enabled;
       document.body.classList.toggle("edit-mode", enabled);
-      editButton.classList.toggle("is-active", enabled);
-      editButton.setAttribute("aria-pressed", String(enabled));
-      editButton.textContent = enabled ? "编辑中" : "编辑";
+      editButton?.classList.toggle("is-active", enabled);
+      editButton?.setAttribute("aria-pressed", String(enabled));
+      if (editButton) editButton.textContent = enabled ? "编辑中" : "编辑";
       getEditableNodes().forEach((el) => {
         el.classList.toggle("editable-target", enabled);
       });
@@ -6973,10 +6971,10 @@
       });
     });
 
-    themeButton.addEventListener("click", () => {
+    themeButton?.addEventListener("click", () => {
       const nextTheme = root.dataset.theme === "dark" ? "light" : "dark";
       root.dataset.theme = nextTheme;
-      themeButton.textContent = nextTheme === "dark" ? "☼" : "☾";
+      if (themeButton) themeButton.textContent = nextTheme === "dark" ? "☼" : "☾";
       if (themeMeta) {
         themeMeta.setAttribute("content", nextTheme === "dark" ? "#09090b" : "#f4f0e8");
       }
@@ -6986,13 +6984,13 @@
     const savedTheme = localStorage.getItem("wuhao-prototype-theme");
     if (savedTheme) {
       root.dataset.theme = savedTheme;
-      themeButton.textContent = savedTheme === "dark" ? "☼" : "☾";
+      if (themeButton) themeButton.textContent = savedTheme === "dark" ? "☼" : "☾";
       if (themeMeta) {
         themeMeta.setAttribute("content", savedTheme === "dark" ? "#09090b" : "#f4f0e8");
       }
     }
 
-    editButton.addEventListener("click", () => {
+    editButton?.addEventListener("click", () => {
       if (editMode) {
         setEditMode(false);
         return;
