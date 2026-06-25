@@ -5233,8 +5233,7 @@
     };
 
     const getFreshVideoUrl = (videoUrl) => {
-      const separator = videoUrl.includes("?") ? "&" : "?";
-      return `${videoUrl}${separator}wuhao_play=${Date.now()}`;
+      return videoUrl;
     };
 
     const shouldUseInlineVideo = () => {
@@ -5726,7 +5725,7 @@
       player.controls = true;
       player.playsInline = true;
       player.autoplay = true;
-      player.preload = "auto";
+      player.preload = "metadata";
       player.disablePictureInPicture = true;
       try { player.disableRemotePlayback = true; } catch (error) {}
       player.controlsList = "nodownload nofullscreen noplaybackrate noremoteplayback";
@@ -5799,7 +5798,7 @@
       player.controls = true;
       player.playsInline = true;
       player.autoplay = true;
-      player.preload = "auto";
+      player.preload = "metadata";
       player.muted = false;
       player.volume = 1;
       try { player.disablePictureInPicture = false; } catch (error) {}
